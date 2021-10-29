@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\People;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PeopleFactory extends Factory
@@ -18,8 +19,35 @@ class PeopleFactory extends Factory
             'email' => $this->faker->email(),
             'surname' => $this->faker->lastName(),
             'forenames' => $this->faker->firstName(),
-            'start_date' => now()->subMonths(rand(1, 24)),
-            'end_date' => now()->addDays(rand(0, 700)),
+            'start_at' => now()->subMonths(rand(1, 24)),
+            'end_at' => now()->addDays(rand(0, 700)),
+            'type' => $this->getRandomType(),
         ];
+    }
+
+    public function getRandomType()
+    {
+        return collect([
+            People::TYPE_ACADEMIC,
+            People::TYPE_PGR,
+        ])->random();
+    }
+
+    public function pgr()
+    {
+        return $this->state(function () {
+            return [
+                'type' => People::TYPE_PGR,
+            ];
+        });
+    }
+
+    public function academic()
+    {
+        return $this->state(function () {
+            return [
+                'type' => People::TYPE_ACADEMIC,
+            ];
+        });
     }
 }

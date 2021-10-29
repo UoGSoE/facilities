@@ -24,22 +24,26 @@ class TestDataSeeder extends Seeder
             'password' => bcrypt('secret'),
         ]);
 
-        $buildings = Building::factory()->count(3)->create();
+        $buildings = collect(['James Watt South', 'Rankine'])->map(fn ($name) => Building::factory()->create(['name' => $name]));
         $buildings->each(function ($building) {
             $rooms = Room::factory()->count(rand(3, 10))->create(['building_id' => $building->id]);
             $rooms->each(function ($room) {
-                $lockers = Locker::factory()->count(rand(30, 100))->create(['room_id' => $room->id]);
-                $desks = Desk::factory()->count(rand(30, 100))->create(['room_id' => $room->id]);
+                $lockers = Locker::factory()->count(rand(10, 30))->create(['room_id' => $room->id]);
+                collect(range(1, rand(10, 60)))->each(function ($i) use ($room) {
+                    Desk::factory()->create(['room_id' => $room->id, 'name' => "$i"]);
+                });
             });
         });
         $people = People::factory()->count(rand(300, 500))->create();
-        $people->each(function ($person) {
+        $leftPeople = People::factory()->count(rand(5, 20))->create(['start_at' => now()->subMonths(rand(12, 24)), 'end_at' => now()->subWeeks(rand(2, 8))]);
+        People::all()->each(function ($person) {
             Desk::inRandomOrder()->take(rand(1, 2))->update(['people_id' => $person->id]);
             Locker::inRandomOrder()->take(rand(1, 2))->update(['people_id' => $person->id]);
         });
-        $supervisors = People::factory()->count(rand(5, 10))->create();
-        $otherPeople = People::whereNotIn('id', $supervisors->pluck('id'))->get()->each(function ($person) use ($supervisors) {
+        $supervisors = People::factory()->count(rand(10, 20))->create();
+        $otherPeople = People::whereNotIn('id', $supervisors->pluck('id')->toArray())->get()->each(function ($person) use ($supervisors) {
             $person->supervisor_id = $supervisors->random()->id;
+            $person->save();
         });
     }
 }

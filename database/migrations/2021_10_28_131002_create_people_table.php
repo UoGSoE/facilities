@@ -19,8 +19,9 @@ class CreatePeopleTable extends Migration
             $table->string('email')->unique();
             $table->string('surname');
             $table->string('forenames');
-            $table->date('start_date')->nullable();
-            $table->date('end_date')->nullable();
+            $table->date('start_at')->nullable();
+            $table->date('end_at')->nullable();
+            $table->string('type')->nullable();
             $table->foreignId('supervisor_id')->nullable()->constrained('people')->onDelete('set null');
             $table->timestamps();
         });
