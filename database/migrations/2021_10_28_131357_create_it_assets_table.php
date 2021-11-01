@@ -15,6 +15,7 @@ class CreateItAssetsTable extends Migration
     {
         Schema::create('it_assets', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
             $table->string('asset_number');
             $table->foreignId('people_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();

@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Building;
 use Tests\TestCase;
+use App\Models\User;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BuildingReportTest extends TestCase
 {
@@ -13,6 +15,14 @@ class BuildingReportTest extends TestCase
     /** @test */
     public function we_can_see_the_building_report_page()
     {
-        $this->markTestSkipped('Do we need a building report?');
+        $user = User::factory()->create();
+        $building1 = Building::factory()->create(['name' => 'First Building']);
+        $building2 = Building::factory()->create(['name' => 'Second Building']);
+
+        $response = $this->actingAs($user)->get('/reports/buildings');
+
+        $response->assertOk();
+        $response->assertSee('First Building');
+        $response->assertSee('Second Building');
     }
 }

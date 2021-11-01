@@ -9,13 +9,25 @@ class Desk extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['name', 'room_id', 'people_id'];
+
     public function owner()
     {
         return $this->belongsTo(People::class, 'people_id');
     }
 
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
+
     public function scopeUnallocated($query)
     {
-        return $query->whereNull('user_id');
+        return $query->whereNull('people_id');
+    }
+
+    public function scopeAllocated($query)
+    {
+        return $query->whereNotNull('people_id');
     }
 }

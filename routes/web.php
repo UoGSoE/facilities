@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', [\App\Http\Controllers\HomeController::class, 'show'])->name('home');
     Route::get('/reports/people', [\App\Http\Controllers\Reports\PeopleReportController::class, 'show'])->name('reports.people');
+    Route::get('/reports/buildings', [\App\Http\Controllers\Reports\BuildingReportController::class, 'show'])->name('reports.buildings');
+    Route::get('/reports/itassets', [\App\Http\Controllers\Reports\ItAssetReportController::class, 'show'])->name('reports.itassets');
 
     Route::get('/building/create', [\App\Http\Controllers\BuildingController::class, 'create'])->name('building.create');
     Route::post('/building/create', [\App\Http\Controllers\BuildingController::class, 'store'])->name('building.store');
@@ -24,8 +26,15 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/building/{building}/edit', [\App\Http\Controllers\BuildingController::class, 'edit'])->name('building.edit');
     Route::post('/building/{building}/edit', [\App\Http\Controllers\BuildingController::class, 'update'])->name('building.update');
 
+    Route::get('/building/{building}/room/create', [\App\Http\Controllers\RoomController::class, 'create'])->name('room.create');
+    Route::post('/building/{building}/room/create', [\App\Http\Controllers\RoomController::class, 'store'])->name('room.store');
     Route::get('/room/{room}', [\App\Http\Controllers\RoomController::class, 'edit'])->name('room.edit');
     Route::post('/room/{room}', [\App\Http\Controllers\RoomController::class, 'update'])->name('room.update');
+    Route::get('/room/{room}/delete', [\App\Http\Controllers\RoomController::class, 'delete'])->name('room.delete');
+    Route::post('/room/{room}/delete', [\App\Http\Controllers\RoomController::class, 'destroy'])->name('room.destroy');
+
+    Route::get('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'show'])->name('room.reallocate');
+    Route::post('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'update'])->name('room.do_reallocate');
 });
 
 require __DIR__.'/auth.php';

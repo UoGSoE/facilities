@@ -32,6 +32,11 @@ class People extends Model
         return $this->belongsTo(People::class);
     }
 
+    public function itAssets()
+    {
+        return $this->hasMany(ItAsset::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('start_at', '<=', now())->where('end_at', '>=', now());

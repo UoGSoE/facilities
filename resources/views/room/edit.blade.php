@@ -1,5 +1,9 @@
 <x-layouts.app>
-    <h3>Edit room {{ $room->name }} in building <a href="{{ route('building.show', $room->building) }}">{{ $room->building->name }}</a></h3>
+    <div class="d-flex justify-content-between">
+        <h3>Edit room {{ $room->name }} in building <a href="{{ route('building.show', $room->building) }}">{{ $room->building->name }}</a></h3>
+        <a href="{{ route('room.reallocate', $room->id) }}" class="btn btn-secondary">Reallocate Everyone</a>
+        <a href="{{ route('room.delete', $room->id) }}" class="btn btn-warning">Delete Room</a>
+    </div>
     <div class="mt-4">
         <span class="bg-info text-white p-2">No Owner</span>
         <span class="bg-warning p-2">Leaving in < 28 days</span>
@@ -63,4 +67,34 @@
                 @endforeach
             </div>
         @endforeach
+
+        <hr>
+        @foreach ($room->lockers->chunk(4) as $someLockers)
+            <div class="row">
+                @foreach ($someLockers as $locker)
+                    <div class="col p-2">
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <div class="input-group-text
+                                        @if (! $locker->owner) bg-info text-white @endif
+                                        @if ($locker->owner && $locker->owner->isLeavingSoon()) bg-warning @endif
+                                        @if ($locker->owner && $locker->owner->hasLeft()) bg-danger text-white @endif
+                                    "
+                                        @if ($locker->owner && $locker->owner->hasLeft()) title="Owner was {{ $locker->owner->full_name }}" @endif
+                                    >
+                                        Locker {{ $locker->name }}
+                                    </div>
+                                    <select class="form-select form-select-sm" aria-label="Select person using locker {{ $locker->name }}">
+                                        <option value="">No-one</option>
+                                        @foreach ($people as $person)
+                                            <option value="{{ $person->id }}" @if ($locker->people_id == $person->id) selected @endif>{{ $person->full_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                    </div>
+                @endforeach
+            </div>
+        @endforeach
+
 </x-layouts.app>

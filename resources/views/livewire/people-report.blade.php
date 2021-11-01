@@ -37,7 +37,9 @@
                 <th>Supervisor</th>
                 <th>Started</th>
                 <th>Ends</th>
-                <th>Desks/Lockers</th>
+                <th>Desks</th>
+                <th>Lockers</th>
+                <th>IT</th>
             </tr>
         </thead>
         <tbody>
@@ -50,7 +52,9 @@
                     <td>{{ optional($person->supervisor)->full_name }}</td>
                     <td>{{ $person->start_at->format('d/m/Y') }}</td>
                     <td>{{ $person->end_at->format('d/m/Y') }}</td>
-                    <td>{{ $person->desks_count }} / {{ $person->lockers_count }} </td>
+                    <td>{{ $person->desks_count }}</td>
+                    <td>{{ $person->lockers_count }}</td>
+                    <td>{{ $person->it_assets_count }}</td>
                 </tr>
             @endforeach
         </tbody>

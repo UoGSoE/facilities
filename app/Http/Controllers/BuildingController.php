@@ -12,7 +12,7 @@ class BuildingController extends Controller
 {
     public function show(Building $building)
     {
-        $building->load('rooms.desks.owner');
+        $building->load('rooms.desks.owner', 'rooms.lockers.owner');
         return view('building.show', [
             'building' => $building,
         ]);

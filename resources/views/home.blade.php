@@ -26,7 +26,7 @@
         <a href="{{ route('building.create') }}" class="btn btn-light mb-4">Add a new building</a>
     </div>
     @foreach ($buildings->chunk(3) as $someBuildings)
-    <div class="row">
+    <div class="row mb-4">
         @foreach ($someBuildings as $building)
             <div class="col">
               <div class="card" style="width: 18rem;">

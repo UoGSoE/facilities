@@ -12,7 +12,8 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="{{ route('reports.people') }}">People</a></li>
-              <li><a class="dropdown-item" href="#">Buildings</a></li>
+              <li><a class="dropdown-item" href="{{ route('reports.buildings') }}">Buildings</a></li>
+              <li><a class="dropdown-item" href="{{ route('reports.itassets') }}">IT Assets</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="#">Something</a></li>
             </ul>

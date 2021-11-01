@@ -15,8 +15,8 @@ class PeopleFactory extends Factory
     public function definition()
     {
         return [
-            'username' => $this->faker->userName(),
-            'email' => $this->faker->email(),
+            'username' => $this->faker->unique()->userName(),
+            'email' => $this->faker->unique()->email(),
             'surname' => $this->faker->lastName(),
             'forenames' => $this->faker->firstName(),
             'start_at' => now()->subMonths(rand(1, 24)),

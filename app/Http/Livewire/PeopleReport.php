@@ -26,7 +26,7 @@ class PeopleReport extends Component
 
     public function getPeople()
     {
-        return People::withCount(['desks', 'lockers'])->with('supervisor')->orderByDesc('end_at')
+        return People::withCount(['desks', 'lockers', 'itAssets'])->with('supervisor')->orderByDesc('end_at')
             ->when(strlen($this->search) > 1, function ($query) {
                 return $query->where('surname', 'like', "%{$this->search}%")->orWhere('forenames', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%");
             })
