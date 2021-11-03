@@ -1,9 +1,9 @@
 <x-layouts.app>
     <div class="d-flex justify-content-between">
         <div>
-            <h3>Details for building {{ $building->name }}</h3>
+            <h3>Details for {{ $room->building->name }} room {{ $room->name }}</h3>
         </div>
-        <a href="{{ route('building.edit', $building) }}" class="btn btn-light">Edit</a>
+        <a href="{{ route('room.edit', $room) }}" class="btn btn-light">Edit</a>
     </div>
     <hr>
     <div class="d-flex justify-content-between">
@@ -12,9 +12,6 @@
             <span class="bg-warning p-2">Leaving in < 28 days</span>
             <span class="bg-danger text-white p-2">Has Left</span>
         </div>
-        <a class="btn btn-light" href="{{ route('room.create', $building) }}">Add a new room</a>
     </div>
-    @foreach ($building->rooms as $room)
-        @include('building.partials.desks_lockers')
-    @endforeach
+    @include('building.partials.desks_lockers')
 </x-layouts.app>

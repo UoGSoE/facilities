@@ -14,6 +14,7 @@
               <li><a class="dropdown-item" href="{{ route('reports.people') }}">People</a></li>
               <li><a class="dropdown-item" href="{{ route('reports.buildings') }}">Buildings</a></li>
               <li><a class="dropdown-item" href="{{ route('reports.itassets') }}">IT Assets</a></li>
+              <li><a class="dropdown-item" href="{{ route('reports.supervisors') }}">Supervisors</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="#">Something</a></li>
             </ul>

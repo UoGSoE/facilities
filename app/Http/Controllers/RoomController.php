@@ -12,6 +12,15 @@ use Illuminate\Validation\ValidationException;
 
 class RoomController extends Controller
 {
+    public function show(Room $room)
+    {
+        $room->load('desks.owner', 'building', 'lockers.owner');
+
+        return view('room.show', [
+            'room' => $room,
+        ]);
+    }
+
     public function create(Building $building)
     {
         return view('room.create', [

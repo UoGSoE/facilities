@@ -57,7 +57,9 @@ class ReallocationTest extends TestCase
         $newBuilding = $buildings->random();
 
         $response = $this->actingAs($user)->post(route('room.do_reallocate', $originalRoom), [
-            'reallocate_to' => $newBuilding->id,
+            'reallocate_to' => [
+                $newBuilding->id => $newBuilding->id,
+            ],
         ]);
 
         $response->assertSessionHasNoErrors();

@@ -59,4 +59,25 @@ class BuildingTest extends TestCase
         $response->assertSessionHasErrors('name');
         $this->assertCount(1, Building::all());
     }
+
+    /** @test */
+    public function we_can_edit_an_existing_building()
+    {
+        $user = User::factory()->create();
+        $building = Building::factory()->create(['name' => 'Old Name']);
+
+        $response = $this->actingAs($user)->get(route('building.edit', $building));
+
+        $response->assertOk();
+        $response->assertSee("Edit building");
+        $response->assertSee($building->name);
+
+        $response = $this->actingAs($user)->post(route('building.update', $building), [
+            'name' => 'New Name',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('building.show', $building));
+        $this->assertEquals('New Name', $building->fresh()->name);
+    }
 }

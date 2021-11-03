@@ -37,6 +37,11 @@ class People extends Model
         return $this->hasMany(ItAsset::class);
     }
 
+    public function supervisees()
+    {
+        return $this->hasMany(People::class, 'supervisor_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('start_at', '<=', now())->where('end_at', '>=', now());
@@ -45,6 +50,11 @@ class People extends Model
     public function getFullNameAttribute(): string
     {
         return "{$this->forenames} {$this->surname}";
+    }
+
+    public function getNameAndTypeAttribute(): string
+    {
+        return $this->full_name . '(' . $this->type . ')';
     }
 
     public function isLeavingSoon(): bool

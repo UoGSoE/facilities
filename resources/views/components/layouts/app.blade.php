@@ -21,6 +21,7 @@
             @endauth
 
             <main class="container mt-4">
+                <x-layouts.messages />
                 {{ $slot }}
             </main>
 

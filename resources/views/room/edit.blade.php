@@ -1,8 +1,10 @@
 <x-layouts.app>
     <div class="d-flex justify-content-between">
         <h3>Edit room {{ $room->name }} in building <a href="{{ route('building.show', $room->building) }}">{{ $room->building->name }}</a></h3>
-        <a href="{{ route('room.reallocate', $room->id) }}" class="btn btn-secondary">Reallocate Everyone</a>
-        <a href="{{ route('room.delete', $room->id) }}" class="btn btn-warning">Delete Room</a>
+        <span>
+            <a href="{{ route('room.reallocate', $room->id) }}" class="btn btn-secondary">Reallocate Everyone</a>
+            <a href="{{ route('room.delete', $room->id) }}" class="btn btn-warning">Delete Room</a>
+        </span>
     </div>
     <div class="mt-4">
         <span class="bg-info text-white p-2">No Owner</span>
@@ -52,6 +54,7 @@
                                         @if ($desk->owner && $desk->owner->hasLeft()) bg-danger text-white @endif
                                     "
                                         @if ($desk->owner && $desk->owner->hasLeft()) title="Owner was {{ $desk->owner->full_name }}" @endif
+                                        @if ($desk->owner && $desk->owner->isLeavingSoon()) title="Leaving {{ $desk->owner->end_at->format('d/m/Y') }}" @endif
                                     >
                                         Desk {{ $desk->name }}
                                     </div>
@@ -81,6 +84,7 @@
                                         @if ($locker->owner && $locker->owner->hasLeft()) bg-danger text-white @endif
                                     "
                                         @if ($locker->owner && $locker->owner->hasLeft()) title="Owner was {{ $locker->owner->full_name }}" @endif
+                                        @if ($locker->owner && $locker->owner->isLeavingSoon()) title="Leaving {{ $locker->owner->end_at->format('d/m/Y') }}" @endif
                                     >
                                         Locker {{ $locker->name }}
                                     </div>

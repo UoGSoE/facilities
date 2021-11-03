@@ -6,7 +6,7 @@
     </p>
     <form>
         <div class="input-group">
-            <select class="form-select" id="reallocate_to" multiple name="reallocate_to[]" aria-label="Reallocate all users to new room">
+            <select class="form-select" id="reallocate_to" multiple name="reallocate_to[]" aria-label="Reallocate all users to new room" required>
                 <option value="-1" selected>Anywhere</option>
                 @foreach ($buildings as $building)
                     <option value="{{ $building->id }}">{{ $building->name }}</option>

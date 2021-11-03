@@ -49,7 +49,13 @@
                     <td>{{ $person->forenames }}</td>
                     <td><a href="mailto:{{ $person->email }}">{{ $person->email }}</a></td>
                     <td>{{ $person->type }}</td>
-                    <td>{{ optional($person->supervisor)->full_name }}</td>
+                    <td>
+                        @if ($person->supervisor)
+                            <a href="{{ route('reports.supervisor', $person->supervisor) }}">
+                                {{ $person->supervisor->full_name }}
+                            </a>
+                        @endif
+                    </td>
                     <td>{{ $person->start_at->format('d/m/Y') }}</td>
                     <td>{{ $person->end_at->format('d/m/Y') }}</td>
                     <td>{{ $person->desks_count }}</td>
