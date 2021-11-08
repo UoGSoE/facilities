@@ -59,7 +59,10 @@ class RoomController extends Controller
             });
             $room->desks()->saveMany($newDesks);
         }
-
+        // add pending people to report
+        // add email everyone in room
+        // add email everyone in a building
+        // add comment/note to room/desk/locker
         if ($request->lockers > 0) {
             $newLockers = collect(range(1, $request->lockers))->map(function ($number) use ($room) {
                 return new Locker([

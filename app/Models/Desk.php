@@ -30,4 +30,14 @@ class Desk extends Model
     {
         return $query->whereNotNull('people_id');
     }
+
+    public function isAllocated(): bool
+    {
+        return $this->people_id != null;
+    }
+
+    public function isUnallocated(): bool
+    {
+        return $this->people_id == null;
+    }
 }

@@ -21,6 +21,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/reports/itassets', [\App\Http\Controllers\Reports\ItAssetReportController::class, 'show'])->name('reports.itassets');
     Route::get('/reports/supervisors', [\App\Http\Controllers\Reports\SupervisorReportController::class, 'index'])->name('reports.supervisors');
     Route::get('/reports/supervisor/{supervisor}', [\App\Http\Controllers\Reports\SupervisorReportController::class, 'show'])->name('reports.supervisor');
+    Route::get('/reports/pending', [\App\Http\Controllers\Reports\PendingReportController::class, 'show'])->name('reports.pending');
 
     Route::get('/building/create', [\App\Http\Controllers\BuildingController::class, 'create'])->name('building.create');
     Route::post('/building/create', [\App\Http\Controllers\BuildingController::class, 'store'])->name('building.store');
@@ -38,6 +39,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'show'])->name('room.reallocate');
     Route::post('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'update'])->name('room.do_reallocate');
+
+    Route::post('/room/{room}/email', [\App\Http\Controllers\EmailController::class, 'room'])->name('email.room');
 });
 
 require __DIR__.'/auth.php';

@@ -25,4 +25,14 @@ class Room extends Model
     {
         return $this->hasMany(Locker::class);
     }
+
+    public function getUnallocatedDeskCountAttribute()
+    {
+        return $this->desks->filter(fn ($desk) => $desk->isUnallocated())->count();
+    }
+
+    public function getUnallocatedLockerCountAttribute()
+    {
+        return $this->lockers->filter(fn ($locker) => $locker->isUnallocated())->count();
+    }
 }

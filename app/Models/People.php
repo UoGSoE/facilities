@@ -47,6 +47,11 @@ class People extends Model
         return $query->where('start_at', '<=', now())->where('end_at', '>=', now());
     }
 
+    public function scopePending($query)
+    {
+        return $query->where('start_at', '>=', now());
+    }
+
     public function getFullNameAttribute(): string
     {
         return "{$this->forenames} {$this->surname}";

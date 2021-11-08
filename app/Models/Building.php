@@ -26,4 +26,14 @@ class Building extends Model
     {
         return $this->rooms->flatMap(fn ($room) => $room->lockers()->unallocated()->get());
     }
+
+    public function getUnallocatedLockerCountAttribute()
+    {
+        return $this->rooms->map(fn ($room) => $room->lockers->filter(fn ($locker) => $locker->isUnallocated())->count())->sum();
+    }
+
+    public function getUnallocatedDeskCountAttribute()
+    {
+        return $this->rooms->map(fn ($room) => $room->desks->filter(fn ($locker) => $locker->isUnallocated())->count())->sum();
+    }
 }

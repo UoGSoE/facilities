@@ -50,4 +50,14 @@ class PeopleFactory extends Factory
             ];
         });
     }
+
+    public function pending()
+    {
+        return $this->state(function () {
+            return [
+                'start_at' => now()->addWeeks(rand(1, 8)),
+                'end_at' => now()->addWeeks(rand(12, 100)),
+            ];
+        });
+    }
 }
