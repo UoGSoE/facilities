@@ -10,8 +10,6 @@ class PendingReportController extends Controller
 {
     public function show()
     {
-        return view('reports.pending', [
-            'people' => People::pending()->with('supervisor')->orderBy('start_at')->get(),
-        ]);
+        return view('reports.pending');
     }
 }

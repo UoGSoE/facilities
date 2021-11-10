@@ -1,4 +1,26 @@
 <div>
+    <div class="row">
+        <div class="col">
+            <label for="" class="form-label">Arriving in the next</label>
+            <div class="input-group">
+                <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="" wire:model="filterWeeks">
+                <div class="input-group-text">weeks</div>
+            </div>
+        </div>
+        <div class="col">
+            <label for="" class="form-label">Type</label>
+            <select class="form-select" aria-label="Type of Person" wire:model="filterType">
+                <option value="any">Any</option>
+                <option value="{{ \App\Models\People::TYPE_PGR }}">PGR</option>
+                <option value="pdra">PDRA</option>
+                <option value="mpatech">MPA/Tech</option>
+                <option value="{{ \App\Models\People::TYPE_ACADEMIC }}">Academics</option>
+            </select>
+        </div>
+    </div>
+
+    <hr>
+
     <h4>Allocate To</h4>
     <div class="d-flex justify-content-left">
         <div class="input-group">
@@ -31,6 +53,7 @@
     @endif
 
     <hr>
+
 
     <table class="table">
         <thead>

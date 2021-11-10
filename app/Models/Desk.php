@@ -11,6 +11,19 @@ class Desk extends Model
 
     protected $fillable = ['name', 'room_id', 'people_id'];
 
+    protected $casts = [
+        'allocated_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::updating(function ($desk) {
+            if ($desk->isDirty('people_id')) {
+                $desk->allocated_at = now();
+            }
+        });
+    }
+
     public function owner()
     {
         return $this->belongsTo(People::class, 'people_id');
@@ -19,6 +32,11 @@ class Desk extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function scopeRecentlyAllocated($query, int $numberOfDays = 28)
+    {
+        return $query->where('allocated_at', '>=', now()->subDays($numberOfDays));
     }
 
     public function scopeUnallocated($query)
@@ -31,6 +49,21 @@ class Desk extends Model
         return $query->whereNotNull('people_id');
     }
 
+    public function allocateTo(People $person)
+    {
+        $this->allocateToId($person->id);
+    }
+
+    public function allocateToId(int $personId)
+    {
+        $this->update(['people_id' => $personId]);
+    }
+
+    public function deallocate()
+    {
+        $this->update(['people_id' => null]);
+    }
+
     public function isAllocated(): bool
     {
         return $this->people_id != null;
@@ -39,5 +72,10 @@ class Desk extends Model
     public function isUnallocated(): bool
     {
         return $this->people_id == null;
+    }
+
+    public function getPrettyName(): string
+    {
+        return "Desk {$this->name}";
     }
 }

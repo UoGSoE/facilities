@@ -39,7 +39,11 @@
                     @if ($supervisee->isLeavingSoon()) class="table-warning" title="Leaving {{ $supervisee->end_at->format('d/m/Y') }}" @endif
                     @if ($supervisee->hasLeft()) class="table-danger" title="Left {{ $supervisee->end_at->format('d/m/Y') }}" @endif
                 >
-                    <td>{{ $supervisee->full_name }}</td>
+                    <td>
+                        <a href="{{ route('people.show', $supervisee) }}">
+                            {{ $supervisee->full_name }}
+                        </a>
+                    </td>
                     <td>{{ $supervisee->email }}</td>
                     <td>
                         @foreach ($supervisee->desks as $desk)

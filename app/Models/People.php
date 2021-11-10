@@ -52,6 +52,11 @@ class People extends Model
         return $query->where('start_at', '>=', now());
     }
 
+    public function scopeNoFacilities($query)
+    {
+        return $query->whereDoesntHave('desks')->whereDoesntHave('lockers');
+    }
+
     public function getFullNameAttribute(): string
     {
         return "{$this->forenames} {$this->surname}";

@@ -18,6 +18,7 @@ class CreateLockersTable extends Migration
             $table->string('name');
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
             $table->foreignId('people_id')->nullable()->constrained()->onDelete('set null');
+            $table->dateTime('allocated_at')->nullable();
             $table->timestamps();
         });
     }

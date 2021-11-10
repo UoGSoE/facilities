@@ -45,7 +45,11 @@
         <tbody>
             @foreach ($people as $person)
                 <tr>
-                    <td>{{ $person->surname }}</td>
+                    <td>
+                        <a href="{{ route('people.show', $person) }}">
+                            {{ $person->surname }}
+                        </a>
+                    </td>
                     <td>{{ $person->forenames }}</td>
                     <td><a href="mailto:{{ $person->email }}">{{ $person->email }}</a></td>
                     <td>{{ $person->type }}</td>

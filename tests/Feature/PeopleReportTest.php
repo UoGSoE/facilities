@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Models\People;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Livewire\Livewire;
 use Tests\TestCase;
+use App\Models\Desk;
+use App\Models\User;
+use App\Models\Locker;
+use App\Models\People;
+use Livewire\Livewire;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PeopleReportTest extends TestCase
 {
@@ -78,5 +80,22 @@ class PeopleReportTest extends TestCase
             ->assertSee($academicPeople[0]->surname)
             ->assertSee($academicPeople[1]->surname)
             ;
+    }
+
+    /** @test */
+    public function we_can_see_the_details_for_an_individual_person()
+    {
+        $user = User::factory()->create();
+        $person = People::factory()->create();
+        $desk = $person->desks()->save(Desk::factory()->make());
+        $locker = $person->lockers()->save(Locker::factory()->make());
+
+        $response = $this->actingAs($user)->get(route('people.show', $person));
+
+        $response->assertOk();
+        $response->assertSee($person->full_name);
+        $response->assertSee($person->email);
+        $response->assertSeeInOrder(["Desk {$person->desks()->first()->name}", $person->desks()->first()->room->building->name, $person->desks()->first()->room->name]);
+        $response->assertSeeInOrder(["Locker {$person->lockers()->first()->name}", $person->lockers()->first()->room->building->name, $person->lockers()->first()->room->name]);
     }
 }

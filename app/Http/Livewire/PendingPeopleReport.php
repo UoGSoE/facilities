@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Desk;
 use App\Models\Room;
 use App\Models\Locker;
+use App\Models\People;
 use Livewire\Component;
 use App\Models\Building;
 use Illuminate\Support\Collection;
@@ -20,21 +21,46 @@ class PendingPeopleReport extends Component
     public $deskAllocations = [];
     public $lockerAllocations = [];
     public $warning = '';
+    public $filterType = 'any';
+    public $filterWeeks = '';
 
-    public function mount(Collection $people)
+    public function mount()
     {
-        $this->people = $people;
-        $this->people->each(function ($person) {
-            $this->allocate[$person->id] = false;
-            $this->deskAllocations[$person->id] = 0;
-            $this->lockerAllocations[$person->id] = 0;
-        });
+        $this->refreshPeopleList();
         $this->buildings = Building::with('rooms')->orderBy('name')->get();
     }
 
     public function render()
     {
         return view('livewire.pending-people-report');
+    }
+
+    protected function refreshPeopleList()
+    {
+        $this->people = People::pending()->noFacilities()
+            ->when($this->filterType != 'any', fn ($query) => $query->where('type', '=', $this->filterType))
+            ->when($this->filterWeeks > 0, fn ($query) => $query->where('start_at', '<=', now()->addWeeks($this->filterWeeks)))
+            ->with('supervisor')
+            ->orderBy('start_at')
+            ->get();
+        $this->allocate = [];
+        $this->deskAllocations = [];
+        $this->lockerAllocations = [];
+        $this->people->each(function ($person) {
+            $this->allocate[$person->id] = false;
+            $this->deskAllocations[$person->id] = 0;
+            $this->lockerAllocations[$person->id] = 0;
+        });
+    }
+
+    public function updatedFilterWeeks()
+    {
+        $this->refreshPeopleList();
+    }
+
+    public function updatedFilterType()
+    {
+        $this->refreshPeopleList();
     }
 
     public function updatedBuildingId()
@@ -125,12 +151,14 @@ class PendingPeopleReport extends Component
 
         collect($this->deskAllocations)->filter(fn ($required) => $required > 0)->each(function ($desksRequired, $personId) {
             $desks = $this->findUnallocatedDesks($desksRequired);
-            $desks->each->update(['people_id' => $personId]);
+            $desks->each->allocateToId($personId);
         });
         collect($this->lockerAllocations)->filter(fn ($required) => $required > 0)->each(function ($lockersRequired, $personId) {
             $lockers = $this->findUnallocatedlockers($lockersRequired);
-            $lockers->each->update(['people_id' => $personId]);
+            $lockers->each->allocateToId($personId);
         });
+
+        $this->refreshPeopleList();
     }
 
     protected function findUnallocatedDesks($numberRequired = 1)
