@@ -42,7 +42,7 @@
                     </div>
         </form>
         <hr>
-        @foreach ($room->desks->chunk(4) as $someDesks)
+        @foreach ($room->desks->chunk(3) as $someDesks)
             <div class="row">
                 @foreach ($someDesks as $desk)
                     <div class="col p-2">
@@ -64,6 +64,7 @@
                                             <option value="{{ $person->id }}" @if ($desk->people_id == $person->id) selected @endif>{{ $person->full_name }}</option>
                                         @endforeach
                                     </select>
+                                    <input type="text" class="form-control" placeholder="Avanti No." value="{{ $desk->avanti_ticket_id }}" aria-label="Avanti Ticket Number" aria-describedby="basic-addon2">
                                 </div>
                             </div>
                     </div>
@@ -72,7 +73,7 @@
         @endforeach
 
         <hr>
-        @foreach ($room->lockers->chunk(4) as $someLockers)
+        @foreach ($room->lockers->chunk(3) as $someLockers)
             <div class="row">
                 @foreach ($someLockers as $locker)
                     <div class="col p-2">
@@ -94,6 +95,7 @@
                                             <option value="{{ $person->id }}" @if ($locker->people_id == $person->id) selected @endif>{{ $person->full_name }}</option>
                                         @endforeach
                                     </select>
+                                    <input type="text" class="form-control" placeholder="Avanti No." value="{{ $locker->avanti_ticket_id }}" aria-label="Avanti Ticket Number" aria-describedby="basic-addon2">
                                 </div>
                             </div>
                     </div>

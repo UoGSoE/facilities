@@ -27,6 +27,6 @@ class FacilitiesEmail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        return $this->markdown('emails.facilities');
+        return $this->subject(config('facilities.email_prefix') . ' ' . $this->subject)->markdown('emails.facilities');
     }
 }

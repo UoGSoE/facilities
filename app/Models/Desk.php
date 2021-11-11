@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Desk extends Model
 {
+    use GenericAllocationLogic;
     use HasFactory;
 
-    protected $fillable = ['name', 'room_id', 'people_id'];
+    protected $fillable = ['name', 'room_id', 'people_id', 'avanti_ticket_id'];
 
     protected $casts = [
         'allocated_at' => 'datetime',
@@ -32,46 +33,6 @@ class Desk extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
-    }
-
-    public function scopeRecentlyAllocated($query, int $numberOfDays = 28)
-    {
-        return $query->where('allocated_at', '>=', now()->subDays($numberOfDays));
-    }
-
-    public function scopeUnallocated($query)
-    {
-        return $query->whereNull('people_id');
-    }
-
-    public function scopeAllocated($query)
-    {
-        return $query->whereNotNull('people_id');
-    }
-
-    public function allocateTo(People $person)
-    {
-        $this->allocateToId($person->id);
-    }
-
-    public function allocateToId(int $personId)
-    {
-        $this->update(['people_id' => $personId]);
-    }
-
-    public function deallocate()
-    {
-        $this->update(['people_id' => null]);
-    }
-
-    public function isAllocated(): bool
-    {
-        return $this->people_id != null;
-    }
-
-    public function isUnallocated(): bool
-    {
-        return $this->people_id == null;
     }
 
     public function getPrettyName(): string

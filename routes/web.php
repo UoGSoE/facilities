@@ -41,7 +41,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'show'])->name('room.reallocate');
     Route::post('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'update'])->name('room.do_reallocate');
 
+    Route::get('/room/{room}/email', [\App\Http\Controllers\EmailController::class, 'showRoomForm'])->name('email.room_form');
     Route::post('/room/{room}/email', [\App\Http\Controllers\EmailController::class, 'room'])->name('email.room');
+    Route::get('/building/{building}/email', [\App\Http\Controllers\EmailController::class, 'showbuildingForm'])->name('email.building_form');
+    Route::post('/building/{building}/email', [\App\Http\Controllers\EmailController::class, 'building'])->name('email.building');
 
     Route::get('/people/{person}', [\App\Http\Controllers\PeopleController::class, 'show'])->name('people.show');
 });

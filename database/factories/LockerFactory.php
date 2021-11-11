@@ -19,6 +19,7 @@ class LockerFactory extends Factory
             'name' => $this->faker->numberBetween(1, 100),
             'room_id' => Room::factory(),
             'people_id' => null,
+            'avanti_ticket_id' => null,
         ];
     }
 }

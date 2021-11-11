@@ -30,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('people.types', function () {
             return collect([
                 People::TYPE_ACADEMIC,
+                People::TYPE_MPATECH,
+                People::TYPE_PDRA,
                 People::TYPE_PGR,
             ]);
         });

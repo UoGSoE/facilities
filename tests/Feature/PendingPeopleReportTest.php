@@ -3,8 +3,13 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\Desk;
+use App\Models\Room;
 use App\Models\User;
+use App\Models\Locker;
 use App\Models\People;
+use Livewire\Livewire;
+use App\Models\Building;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -17,7 +22,7 @@ class PendingPeopleReportTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $user = User::factory()->create();
-        $pendingPeople = People::factory()->pending()->count(3)->create();
+        $pendingPeople = People::factory()->pending()->count(3)->create(['start_at' => now()->addWeek()]);
         $allocatedPeople = People::factory()->count(3)->create();
 
         $response = $this->actingAs($user)->get(route('reports.pending'));
@@ -35,6 +40,179 @@ class PendingPeopleReportTest extends TestCase
     /** @test */
     public function we_can_allocate_people_with_desks_and_lockers()
     {
-        $this->markTestSkipped('Write test');
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+        Desk::factory()->count(5)->create();
+        Locker::factory()->count(5)->create();
+        $pendingPerson1 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $allocatedPerson = People::factory()->create();
+
+        Livewire::actingAs($user)->test('pending-people-report')
+            ->assertSee($pendingPerson1->full_name)
+            ->assertSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ->assertDontSee($allocatedPerson->full_name)
+            ->set('deskAllocations.' . $pendingPerson1->id, 1)
+            ->set('deskAllocations.' . $pendingPerson2->id, 1)
+            ->set('deskAllocations.' . $pendingPerson3->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson1->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson2->id, 1)
+            ->set('lockerAllocations.' . $pendingPerson3->id, 0)
+            ->call('allocate')
+            ->assertDontSee($pendingPerson1->full_name)
+            ->assertDontSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ;
+
+        $this->assertCount(1, $pendingPerson1->fresh()->desks);
+        $this->assertCount(1, $pendingPerson2->fresh()->desks);
+        $this->assertCount(0, $pendingPerson3->fresh()->desks);
+        $this->assertCount(0, $pendingPerson1->fresh()->lockers);
+        $this->assertCount(1, $pendingPerson2->fresh()->lockers);
+        $this->assertCount(0, $pendingPerson3->fresh()->lockers);
+    }
+
+    /** @test */
+    public function we_can_allocate_people_with_desks_and_lockers_to_a_specific_building_or_room()
+    {
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+        $building1 = Building::factory()->create();
+        $building2 = Building::factory()->create();
+        $room1 = Room::factory()->create(['building_id' => $building1->id]);
+        $room2 = Room::factory()->create(['building_id' => $building2->id]);
+        Desk::factory()->count(5)->create([
+            'room_id' => $room1->id,
+        ]);
+        Locker::factory()->count(5)->create([
+            'room_id' => $room1->id,
+        ]);
+        Desk::factory()->count(5)->create([
+            'room_id' => $room2->id,
+        ]);
+        Locker::factory()->count(5)->create([
+            'room_id' => $room2->id,
+        ]);
+        $pendingPerson1 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $allocatedPerson = People::factory()->create();
+
+        Livewire::actingAs($user)->test('pending-people-report')
+            ->assertSee($pendingPerson1->full_name)
+            ->assertSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ->assertDontSee($allocatedPerson->full_name)
+            ->set('buildingId', $building1->id)
+            ->set('roomId', $room1->id)
+            ->set('deskAllocations.' . $pendingPerson1->id, 1)
+            ->set('deskAllocations.' . $pendingPerson2->id, 1)
+            ->set('lockerAllocations.' . $pendingPerson2->id, 1)
+            ->call('allocate')
+            ->assertDontSee($pendingPerson1->full_name)
+            ->assertDontSee($pendingPerson2->full_name)
+            ->set('buildingId', $building2->id)
+            ->set('deskAllocations.' . $pendingPerson3->id, 1)
+            ->set('lockerAllocations.' . $pendingPerson3->id, 1)
+            ->call('allocate')
+            ->assertDontSee($pendingPerson1->full_name)
+            ->assertDontSee($pendingPerson2->full_name)
+            ->assertDontSee($pendingPerson3->full_name)
+            ;
+
+        $this->assertCount(1, $pendingPerson1->fresh()->desks);
+        $this->assertCount(1, $pendingPerson2->fresh()->desks);
+        $this->assertCount(1, $pendingPerson3->fresh()->desks);
+        $this->assertCount(0, $pendingPerson1->fresh()->lockers);
+        $this->assertCount(1, $pendingPerson2->fresh()->lockers);
+        $this->assertCount(1, $pendingPerson3->fresh()->lockers);
+        $this->assertTrue($pendingPerson1->fresh()->desks->first()->room->is($room1));
+        $this->assertTrue($pendingPerson2->fresh()->desks->first()->room->is($room1));
+        $this->assertTrue($pendingPerson2->fresh()->lockers->first()->room->is($room1));
+        $this->assertTrue($pendingPerson3->fresh()->desks->first()->room->is($room2));
+        $this->assertTrue($pendingPerson3->fresh()->lockers->first()->room->is($room2));
+    }
+
+    /** @test */
+    public function if_there_arent_enough_desks_or_lockers_available_we_dont_allocate_anything()
+    {
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+        Desk::factory()->count(2)->create();
+        Locker::factory()->count(2)->create();
+        $pendingPerson1 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $allocatedPerson = People::factory()->create();
+
+        Livewire::actingAs($user)->test('pending-people-report')
+            ->assertSee($pendingPerson1->full_name)
+            ->assertSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ->assertDontSee($allocatedPerson->full_name)
+            ->set('deskAllocations.' . $pendingPerson1->id, 3)
+            ->set('deskAllocations.' . $pendingPerson2->id, 3)
+            ->set('deskAllocations.' . $pendingPerson3->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson1->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson2->id, 3)
+            ->set('lockerAllocations.' . $pendingPerson3->id, 0)
+            ->assertSee('Not enough desks. Not enough lockers.')
+            ->call('allocate')
+            ->assertSee($pendingPerson1->full_name)
+            ->assertSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ;
+
+        $this->assertCount(0, $pendingPerson1->fresh()->desks);
+        $this->assertCount(0, $pendingPerson2->fresh()->desks);
+        $this->assertCount(0, $pendingPerson3->fresh()->desks);
+        $this->assertCount(0, $pendingPerson1->fresh()->lockers);
+        $this->assertCount(0, $pendingPerson2->fresh()->lockers);
+        $this->assertCount(0, $pendingPerson3->fresh()->lockers);
+    }
+
+    /** @test */
+    public function we_can_optionally_add_an_avanti_ticket_id_to_allocations()
+    {
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+        Desk::factory()->count(5)->create();
+        Locker::factory()->count(5)->create();
+        $pendingPerson1 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $allocatedPerson = People::factory()->create();
+
+        Livewire::actingAs($user)->test('pending-people-report')
+            ->assertSee($pendingPerson1->full_name)
+            ->assertSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ->assertDontSee($allocatedPerson->full_name)
+            ->set('deskAllocations.' . $pendingPerson1->id, 1)
+            ->set('avantiIds.' . $pendingPerson1->id, '12345')
+            ->set('deskAllocations.' . $pendingPerson2->id, 1)
+            ->set('avantiIds.' . $pendingPerson2->id, '54321')
+            ->set('deskAllocations.' . $pendingPerson3->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson1->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson2->id, 1)
+            ->set('lockerAllocations.' . $pendingPerson3->id, 0)
+            ->call('allocate')
+            ->assertDontSee($pendingPerson1->full_name)
+            ->assertDontSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ;
+
+        $this->assertCount(1, $pendingPerson1->fresh()->desks);
+        $this->assertCount(1, $pendingPerson2->fresh()->desks);
+        $this->assertCount(0, $pendingPerson3->fresh()->desks);
+        $this->assertCount(0, $pendingPerson1->fresh()->lockers);
+        $this->assertCount(1, $pendingPerson2->fresh()->lockers);
+        $this->assertCount(0, $pendingPerson3->fresh()->lockers);
+
+        $this->assertEquals('12345', $pendingPerson1->fresh()->desks->first()->avanti_ticket_id);
+        $this->assertEquals('54321', $pendingPerson2->fresh()->desks->first()->avanti_ticket_id);
+        $this->assertEquals('54321', $pendingPerson2->fresh()->lockers->first()->avanti_ticket_id);
     }
 }

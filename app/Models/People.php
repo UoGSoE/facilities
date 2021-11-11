@@ -11,6 +11,8 @@ class People extends Model
 
     const TYPE_PGR = 'PGR';
     const TYPE_ACADEMIC = 'Academic';
+    const TYPE_PDRA = 'PDRA';
+    const TYPE_MPATECH = 'MPA/Techs';
 
     protected $casts = [
         'start_at' => 'date',
@@ -44,7 +46,7 @@ class People extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('start_at', '<=', now())->where('end_at', '>=', now());
+        return $query->where('end_at', '>=', now());
     }
 
     public function scopePending($query)

@@ -20,9 +20,17 @@ class PendingPeopleReport extends Component
     public $allocate = [];
     public $deskAllocations = [];
     public $lockerAllocations = [];
+    public $avantiIds = [];
     public $warning = '';
     public $filterType = 'any';
-    public $filterWeeks = '';
+    public $filterWeeks = 4;
+
+    protected $queryString = ['filterType', 'filterWeeks'];
+
+    protected $rules = [
+        'deskAllocations.*' => 'required|integer|min:0|max:5',
+        'lockerAllocations.*' => 'required|integer|min:0|max:5',
+    ];
 
     public function mount()
     {
@@ -50,6 +58,7 @@ class PendingPeopleReport extends Component
             $this->allocate[$person->id] = false;
             $this->deskAllocations[$person->id] = 0;
             $this->lockerAllocations[$person->id] = 0;
+            $this->avantiIds[$person->id] = null;
         });
     }
 
@@ -93,6 +102,12 @@ class PendingPeopleReport extends Component
     protected function checkCapacity()
     {
         $this->warning = '';
+        try {
+            $this->validate();
+        } catch (\Exception $e) {
+            $this->warning = $e->getMessage();
+            throw $e;
+        }
         $this->checkTotalCapacity();
         $this->checkBuildingCapacity();
         $this->checkRoomCapacity();
@@ -144,6 +159,10 @@ class PendingPeopleReport extends Component
 
     public function allocate()
     {
+        if ($this->warning) {
+            return;
+        }
+
         if (collect($this->deskAllocations)->sum() == 0 && collect($this->lockerAllocations)->sum() == 0) {
             $this->warning = 'No allocations requested.';
             return;
@@ -151,11 +170,11 @@ class PendingPeopleReport extends Component
 
         collect($this->deskAllocations)->filter(fn ($required) => $required > 0)->each(function ($desksRequired, $personId) {
             $desks = $this->findUnallocatedDesks($desksRequired);
-            $desks->each->allocateToId($personId);
+            $desks->each->allocateToId($personId, $this->avantiIds[$personId]);
         });
         collect($this->lockerAllocations)->filter(fn ($required) => $required > 0)->each(function ($lockersRequired, $personId) {
             $lockers = $this->findUnallocatedlockers($lockersRequired);
-            $lockers->each->allocateToId($personId);
+            $lockers->each->allocateToId($personId, $this->avantiIds[$personId]);
         });
 
         $this->refreshPeopleList();

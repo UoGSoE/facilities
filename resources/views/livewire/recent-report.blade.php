@@ -30,10 +30,12 @@
         <thead>
             <tr>
                 <th>Person</th>
+                <th>Type</th>
                 <th>Asset</th>
                 <th>Building</th>
                 <th>Room</th>
                 <th>Allocated</th>
+                <th>Avanti</th>
             </tr>
         </thead>
         <tbody>
@@ -41,9 +43,10 @@
                 <tr>
                     <td>
                         <a href="{{ route('people.show', $asset->owner) }}">
-                            {{ $asset->owner->full_name }} ({{ $asset->owner->type }})
+                            {{ $asset->owner->full_name }}
                         </a>
                     </td>
+                    <td>{{ $asset->owner->type }}</td>
                     <td>{{ $asset->getPrettyName() }}</td>
                     <td>
                         <a href="{{ route('building.show', $asset->room->building) }}">
@@ -56,6 +59,7 @@
                         </a>
                     </td>
                     <td>{{ $asset->allocated_at->format('d/m/Y') }}</td>
+                    <td>{{ $asset->avanti_ticket_id }}</td>
                 </tr>
             @endforeach
         </tbody>

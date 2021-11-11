@@ -19,6 +19,7 @@ class CreateDesksTable extends Migration
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
             $table->foreignId('people_id')->nullable()->constrained()->onDelete('set null');
             $table->dateTime('allocated_at')->nullable();
+            $table->string('avanti_ticket_id')->nullable();
             $table->timestamps();
         });
     }

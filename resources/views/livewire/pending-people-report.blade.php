@@ -11,10 +11,9 @@
             <label for="" class="form-label">Type</label>
             <select class="form-select" aria-label="Type of Person" wire:model="filterType">
                 <option value="any">Any</option>
-                <option value="{{ \App\Models\People::TYPE_PGR }}">PGR</option>
-                <option value="pdra">PDRA</option>
-                <option value="mpatech">MPA/Tech</option>
-                <option value="{{ \App\Models\People::TYPE_ACADEMIC }}">Academics</option>
+                @foreach (app('people.types') as $type)
+                    <option value="{{ $type }}">{{ $type }}</option>
+                @endforeach
             </select>
         </div>
     </div>
@@ -44,7 +43,7 @@
             </select>
         </div>
         <div class="ms-4">
-            <button class="btn btn-primary" wire:click.prevent="allocate">Allocate</button>
+            <button class="btn btn-primary" wire:click.prevent="allocate" @if ($warning) disabled @endif>Allocate</button>
         </div>
     </div>
 
@@ -58,13 +57,6 @@
     <table class="table">
         <thead>
             <tr>
-                <th>
-                    <button class="btn btn-sm text-danger text-start" title="Remove from pending">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
-                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
-                          </svg>
-                    </button>
-                </th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Supervisor</th>
@@ -72,31 +64,34 @@
                 <th>Type</th>
                 <th width="10%">Desks Wanted</th>
                 <th width="10%">Lockers Wanted</th>
+                <th width="10%">Avanti No.</th>
             </tr>
         </thead>
         <tbody>
             @foreach($people as $person)
                 <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" wire:model="allocate.{{ $person->id }}" value="{{ $person->id }}" id="flexCheckDefault">
-                          </div>
-                    </td>
                     <td><a href="">{{ $person->full_name }}</a></td>
                     <td><a href="mailto:{{ $person->email }}">{{ $person->email }}</a></td>
                     <td>
-                        {{ optional($person->supervisor)->full_name }}
+                        @if ($person->supervisor)
+                            <a href="{{ route('reports.supervisor', $person->supervisor) }}">{{ $person->supervisor->full_name }}</a>
+                        @endif
                     </td>
                     <td>{{ $person->start_at->format('d/m/Y') }}</td>
                     <td>{{ $person->type }}</td>
-                    <td>
+                    <td @error('deskAllocations.' . $person->id) class="bg-danger" @enderror>
                         <div>
                             <input type="number" min="0" max="5" wire:model.debounce.500ms="deskAllocations.{{ $person->id }}" class="form-control" id="exampleFormControlInput1">
                         </div>
                     </td>
-                    <td>
+                    <td @error('lockerAllocations.' . $person->id) class="bg-danger" @enderror>
                         <div>
                             <input type="number" min="0" max="5" wire:model.debounce.500ms="lockerAllocations.{{ $person->id }}" class="form-control" id="exampleFormControlInput1">
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <input type="text" wire:model.debounce.500ms="avantiIds.{{ $person->id }}" class="form-control" id="exampleFormControlInput1">
                         </div>
                     </td>
                 </tr>

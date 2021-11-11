@@ -27,10 +27,7 @@ class PeopleFactory extends Factory
 
     public function getRandomType()
     {
-        return collect([
-            People::TYPE_ACADEMIC,
-            People::TYPE_PGR,
-        ])->random();
+        return app('people.types')->random();
     }
 
     public function pgr()

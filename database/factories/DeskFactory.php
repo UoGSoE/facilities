@@ -18,6 +18,7 @@ class DeskFactory extends Factory
             'name' => $this->faker->numberBetween(1, 30),
             'room_id' => Room::factory(),
             'people_id' => null,
+            'avanti_ticket_id' => null,
         ];
     }
 }
