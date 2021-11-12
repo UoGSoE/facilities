@@ -24,9 +24,10 @@
             </div>
         </div>
     </div>
-    <form>
-    </form>
     <hr>
+    <div class="d-flex justify-content-end">
+        <button wire:click.prevent="exportCsv" class="btn btn-outline-primary">Export</button>
+    </div>
     <table class="table">
         <thead>
             <tr>

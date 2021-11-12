@@ -1,4 +1,5 @@
 <x-layouts.app>
+    @section('title') Home @endsection
     <div class="row">
         <div class="col">
             <p>Buildings</p>

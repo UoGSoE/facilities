@@ -1,4 +1,5 @@
 <x-layouts.app>
+    @section('title') Supervisor {{ $supervisor->full_name }} @endsection
     <div class="d-flex justify-content-between">
         <h3>Supervisor {{ $supervisor->full_name }}</h3>
         <a class="btn btn-info text-white" href="mailto:{{ $supervisor->email }}"><i class="bi bi-envelope"></i></a>

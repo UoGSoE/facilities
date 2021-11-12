@@ -1,4 +1,5 @@
 <x-layouts.app>
+    @section('title') Building {{ $building->name }} @endsection
     <div class="d-flex justify-content-between">
         <div>
             <h3>

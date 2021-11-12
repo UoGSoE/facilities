@@ -1,4 +1,5 @@
 <x-layouts.app>
+    @section('title') {{ $room->building->name }} Room {{ $room->name }} @endsection
     <div class="d-flex justify-content-between">
         <div>
             <h3>Details for {{ $room->building->name }} room {{ $room->name }}</h3>

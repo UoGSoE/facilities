@@ -58,4 +58,21 @@ class RecentReport extends Component
                 }
             );
     }
+
+    public function exportCsv()
+    {
+        $this->getRecentAllocations();
+        return response()->streamDownload(function () {
+            echo "Person,Type,Asset,Building,Room,Allocated,Avanti\n";
+            foreach ($this->recents as $asset) {
+                echo $asset->owner->full_name . ',';
+                echo $asset->owner->type . ',';
+                echo $asset->getPrettyName() . ',';
+                echo $asset->room->building->name . ',';
+                echo $asset->room->name . ',';
+                echo $asset->allocated_at->format('d/m/Y') . ',';
+                echo $asset->avanti_ticket_id . "\n";
+            }
+        }, 'recent_allocated_facilites_' . now()->format('d-m-Y-H-i') . '.csv', ['Content-Type' => 'text/csv']);
+    }
 }

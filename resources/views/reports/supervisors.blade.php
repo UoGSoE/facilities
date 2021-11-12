@@ -1,4 +1,5 @@
 <x-layouts.app>
+    @section('title') Supervisors @endsection
     <h3>Supervisors Report</h3>
     <hr>
     <table class="table">

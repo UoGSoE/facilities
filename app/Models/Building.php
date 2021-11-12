@@ -17,6 +17,16 @@ class Building extends Model
         return $this->hasMany(Room::class);
     }
 
+    public function desks()
+    {
+        return $this->hasManyThrough(Desk::class, Room::class);
+    }
+
+    public function lockers()
+    {
+        return $this->hasManyThrough(Locker::class, Room::class);
+    }
+
     public function getUnallocatedDesks(): Collection
     {
         return $this->rooms->flatMap(fn ($room) => $room->desks()->unallocated()->get());

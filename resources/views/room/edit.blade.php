@@ -1,4 +1,5 @@
 <x-layouts.app>
+    @section('title') Edit room {{ $room->name }} @endsection
     <div class="d-flex justify-content-between">
         <h3>Edit room {{ $room->name }} in building <a href="{{ route('building.show', $room->building) }}">{{ $room->building->name }}</a></h3>
         <span>

@@ -70,7 +70,7 @@
         <tbody>
             @foreach($people as $person)
                 <tr>
-                    <td><a href="">{{ $person->full_name }}</a></td>
+                    <td><a href="{{ route('people.show', $person) }}">{{ $person->full_name }}</a></td>
                     <td><a href="mailto:{{ $person->email }}">{{ $person->email }}</a></td>
                     <td>
                         @if ($person->supervisor)

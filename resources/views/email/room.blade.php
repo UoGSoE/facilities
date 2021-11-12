@@ -1,4 +1,5 @@
 <x-layouts.app>
+    @section('title') Email room {{ $room->name }} @endsection
     <h3>Send email to people in <a href="{{ route('building.show', $room->building) }}">{{ $room->building->name }}</a> room <a href="{{ route('room.show', $room) }}">{{ $room->name }}</a></h3>
     <hr>
     <form action="{{ route('email.room', $room) }}" method="POST">

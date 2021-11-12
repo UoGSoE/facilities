@@ -26,6 +26,36 @@ class PeopleReport extends Component
 
     public function getPeople()
     {
+        return $this->getPeopleQuery()->paginate($this->perPage);
+    }
+
+    public function exportCsv()
+    {
+        $people = $this->getPeopleQuery()->get();
+        return response()->streamDownload(function () use ($people) {
+            echo "Surname,Forenames,Email,Type,Supervisor,Started,Ends,Desks,Lockers,IT\n";
+            foreach ($people as $person) {
+                echo $person->surname . ',';
+                echo $person->forenames . ',';
+                echo $person->email . ',';
+                echo $person->type . ',';
+                echo optional($person->supervisor)->full_name . ',';
+                echo $person->start_at->format('d/m/Y') . ',';
+                echo $person->end_at->format('d/m/Y') . ',';
+                echo $person->desks_count . ',';
+                echo $person->lockers_count . ',';
+                echo $person->it_assets_count . "\n";
+            }
+        }, 'facilities_all_people_' . now()->format('d-m-Y-H-i') . '.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    public function updating()
+    {
+        $this->resetPage();
+    }
+
+    protected function getPeopleQuery()
+    {
         return People::withCount(['desks', 'lockers', 'itAssets'])->with('supervisor')->orderByDesc('end_at')
             ->when(strlen($this->search) > 1, function ($query) {
                 return $query->where('surname', 'like', "%{$this->search}%")->orWhere('forenames', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%");
@@ -35,12 +65,6 @@ class PeopleReport extends Component
             })
             ->when($this->peopleType != 'any', function ($query) {
                 return $query->where('type', '=', $this->peopleType);
-            })
-            ->paginate($this->perPage);
-    }
-
-    public function updating()
-    {
-        $this->resetPage();
+            });
     }
 }
