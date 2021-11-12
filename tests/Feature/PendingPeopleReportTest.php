@@ -10,6 +10,8 @@ use App\Models\Locker;
 use App\Models\People;
 use Livewire\Livewire;
 use App\Models\Building;
+use App\Mail\PendingAllocationEmail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -214,5 +216,91 @@ class PendingPeopleReportTest extends TestCase
         $this->assertEquals('12345', $pendingPerson1->fresh()->desks->first()->avanti_ticket_id);
         $this->assertEquals('54321', $pendingPerson2->fresh()->desks->first()->avanti_ticket_id);
         $this->assertEquals('54321', $pendingPerson2->fresh()->lockers->first()->avanti_ticket_id);
+    }
+
+    /** @test */
+    public function when_we_change_the_filters_the_desk_and_locker_allocations_are_reset()
+    {
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+        Desk::factory()->count(5)->create();
+        Locker::factory()->count(5)->create();
+        $pendingPerson1 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $allocatedPerson = People::factory()->create();
+
+        Livewire::actingAs($user)->test('pending-people-report')
+            ->assertSee($pendingPerson1->full_name)
+            ->assertSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ->assertDontSee($allocatedPerson->full_name)
+            ->set('deskAllocations.' . $pendingPerson1->id, 1)
+            ->set('avantiIds.' . $pendingPerson1->id, '12345')
+            ->set('deskAllocations.' . $pendingPerson2->id, 1)
+            ->set('avantiIds.' . $pendingPerson2->id, '54321')
+            ->set('deskAllocations.' . $pendingPerson3->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson1->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson2->id, 1)
+            ->set('lockerAllocations.' . $pendingPerson3->id, 0)
+            ->set('filterWeeks', 5)
+            ->assertSet('deskAllocations.' . $pendingPerson1->id, 0)
+            ->assertSet('deskAllocations.' . $pendingPerson2->id, 0)
+            ->assertSet('deskAllocations.' . $pendingPerson3->id, 0)
+            ->assertSet('lockerAllocations.' . $pendingPerson1->id, 0)
+            ->assertSet('lockerAllocations.' . $pendingPerson2->id, 0)
+            ->assertSet('lockerAllocations.' . $pendingPerson3->id, 0)
+            ->assertSet('avantiIds.' . $pendingPerson1->id, null)
+            ->assertSet('avantiIds.' . $pendingPerson2->id, null)
+            ->assertSet('avantiIds.' . $pendingPerson3->id, null)
+            ;
+    }
+
+    /** @test */
+    public function when_allocations_happen_an_email_is_sent_to_the_person_who_triggered_it_with_details_of_the_allocations()
+    {
+        Mail::fake();
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+        Desk::factory()->count(5)->create();
+        Locker::factory()->count(5)->create();
+        $pendingPerson1 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
+        $allocatedPerson = People::factory()->create();
+
+        Livewire::actingAs($user)->test('pending-people-report')
+            ->assertSee($pendingPerson1->full_name)
+            ->assertSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ->assertDontSee($allocatedPerson->full_name)
+            ->set('deskAllocations.' . $pendingPerson1->id, 1)
+            ->set('avantiIds.' . $pendingPerson1->id, '12345')
+            ->set('deskAllocations.' . $pendingPerson2->id, 1)
+            ->set('avantiIds.' . $pendingPerson2->id, '54321')
+            ->set('deskAllocations.' . $pendingPerson3->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson1->id, 0)
+            ->set('lockerAllocations.' . $pendingPerson2->id, 1)
+            ->set('lockerAllocations.' . $pendingPerson3->id, 0)
+            ->call('allocate')
+            ->assertDontSee($pendingPerson1->full_name)
+            ->assertDontSee($pendingPerson2->full_name)
+            ->assertSee($pendingPerson3->full_name)
+            ;
+
+        $this->assertCount(1, $pendingPerson1->fresh()->desks);
+        $this->assertCount(1, $pendingPerson2->fresh()->desks);
+        $this->assertCount(0, $pendingPerson3->fresh()->desks);
+        $this->assertCount(0, $pendingPerson1->fresh()->lockers);
+        $this->assertCount(1, $pendingPerson2->fresh()->lockers);
+        $this->assertCount(0, $pendingPerson3->fresh()->lockers);
+
+        $this->assertEquals('12345', $pendingPerson1->fresh()->desks->first()->avanti_ticket_id);
+        $this->assertEquals('54321', $pendingPerson2->fresh()->desks->first()->avanti_ticket_id);
+        $this->assertEquals('54321', $pendingPerson2->fresh()->lockers->first()->avanti_ticket_id);
+
+        Mail::assertQueued(PendingAllocationEmail::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email);
+        });
     }
 }

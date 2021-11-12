@@ -9,6 +9,9 @@ use App\Models\People;
 use Livewire\Component;
 use App\Models\Building;
 use Illuminate\Support\Collection;
+use App\Mail\PendingAllocationEmail;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class PendingPeopleReport extends Component
 {
@@ -24,6 +27,7 @@ class PendingPeopleReport extends Component
     public $warning = '';
     public $filterType = 'any';
     public $filterWeeks = 4;
+    protected $allocatedAssets = [];
 
     protected $queryString = ['filterType', 'filterWeeks'];
 
@@ -168,14 +172,36 @@ class PendingPeopleReport extends Component
             return;
         }
 
+        $this->allocatedAssets = [];
+
         collect($this->deskAllocations)->filter(fn ($required) => $required > 0)->each(function ($desksRequired, $personId) {
             $desks = $this->findUnallocatedDesks($desksRequired);
-            $desks->each->allocateToId($personId, $this->avantiIds[$personId]);
+            $desks->each(function ($desk) use ($personId) {
+                $desk->allocateToId($personId, $this->avantiIds[$personId]);
+                $this->allocatedAssets[] = [
+                    'person' => People::find($personId)->full_name,
+                    'asset' => 'Desk ' . $desk->name,
+                    'building' =>  $desk->room->building->name,
+                    'room' => $desk->room->name,
+                    'avanti' => $this->avantiIds[$personId],
+                ];
+            });
         });
         collect($this->lockerAllocations)->filter(fn ($required) => $required > 0)->each(function ($lockersRequired, $personId) {
             $lockers = $this->findUnallocatedlockers($lockersRequired);
-            $lockers->each->allocateToId($personId, $this->avantiIds[$personId]);
+            $lockers->each(function ($locker) use ($personId) {
+                $locker->allocateToId($personId, $this->avantiIds[$personId]);
+                $this->allocatedAssets[] = [
+                    'person' => People::find($personId)->full_name,
+                    'asset' => 'Locker ' . $locker->name,
+                    'building' =>  $locker->room->building->name,
+                    'room' => $locker->room->name,
+                    'avanti' => $this->avantiIds[$personId],
+                ];
+            });
         });
+
+        Mail::to(Auth::user())->queue(new PendingAllocationEmail($this->allocatedAssets));
 
         $this->refreshPeopleList();
     }
