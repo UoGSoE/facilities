@@ -47,6 +47,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/building/{building}/email', [\App\Http\Controllers\EmailController::class, 'building'])->name('email.building');
 
     Route::get('/people/{person}', [\App\Http\Controllers\PeopleController::class, 'show'])->name('people.show');
+
+    Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('user.index');
 });
 
 require __DIR__.'/auth.php';
