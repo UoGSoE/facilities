@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\People;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 
 class PeopleFactory extends Factory
 {
@@ -22,12 +23,23 @@ class PeopleFactory extends Factory
             'start_at' => now()->subMonths(rand(1, 24)),
             'end_at' => now()->addDays(rand(0, 700)),
             'type' => $this->getRandomType(),
+            'usergroup' => $this->getRandomUsergroup(),
         ];
     }
 
     public function getRandomType()
     {
         return app('people.types')->random();
+    }
+
+    public function getRandomUsergroup()
+    {
+        return Arr::random([
+            'Bio',
+            'Civil',
+            'Mech',
+            'Aero',
+        ]);
     }
 
     public function pgr()

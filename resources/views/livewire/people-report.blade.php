@@ -18,6 +18,15 @@
             </select>
         </div>
         <div class="col">
+            <label for="" class="form-label">Usergroup</label>
+            <select class="form-select" aria-label="User group" wire:model="usergroup">
+                <option value="">Any</option>
+                @foreach ($usergroups as $group)
+                    <option value="{{ $group }}">{{ $group }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col">
             <label for="" class="form-label">Search</label>
             <div class="input-group">
                 <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="" wire:model="search">
@@ -35,6 +44,7 @@
                 <th>Forenames</th>
                 <th>Email</th>
                 <th>Type</th>
+                <th>Group</th>
                 <th>Supervisor</th>
                 <th>Started</th>
                 <th>Ends</th>
@@ -54,6 +64,7 @@
                     <td>{{ $person->forenames }}</td>
                     <td><a href="mailto:{{ $person->email }}">{{ $person->email }}</a></td>
                     <td>{{ $person->type }}</td>
+                    <td>{{ $person->usergroup }}</td>
                     <td>
                         @if ($person->supervisor)
                             <a href="{{ route('reports.supervisor', $person->supervisor) }}">

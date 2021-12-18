@@ -35,6 +35,7 @@ class PeopleReportTest extends TestCase
         $user = User::factory()->create();
         $phdPeople = People::factory()->pgr()->count(3)->create();
         $academicPeople = People::factory()->academic()->count(3)->create();
+        $bioEngPeople = People::factory()->count(3)->create(['usergroup' => 'bioeng']);
         $currentUser = People::factory()->create([
             'start_at' => now()->subWeeks(10),
             'end_at' => now()->addWeeks(10),
@@ -79,7 +80,19 @@ class PeopleReportTest extends TestCase
             ->assertSee($phdPeople[1]->surname)
             ->assertSee($academicPeople[0]->surname)
             ->assertSee($academicPeople[1]->surname)
-            ;
+            // usergroup
+            ->assertSee($bioEngPeople[0]->surname)
+            ->assertSee($bioEngPeople[1]->surname)
+            ->set('usergroup', 'bioeng')
+            ->assertSee($bioEngPeople[0]->surname)
+            ->assertSee($bioEngPeople[1]->surname)
+            ->set('usergroup', 'lasersandstuff')
+            ->assertDontSee($bioEngPeople[0]->surname)
+            ->assertDontSee($bioEngPeople[1]->surname)
+            ->set('usergroup', '')
+            ->assertSee($bioEngPeople[0]->surname)
+            ->assertSee($bioEngPeople[1]->surname);
+        ;
     }
 
     /** @test */

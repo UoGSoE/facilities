@@ -16,17 +16,24 @@ class PeopleReport extends Component
     public $search = '';
     public $leavingWeeks = '';
     public $peopleType = 'any';
+    public $usergroup = '';
 
     public function render()
     {
         return view('livewire.people-report', [
             'people' => $this->getPeople(),
+            'usergroups' => $this->getUsergroups(),
         ]);
     }
 
     public function getPeople()
     {
         return $this->getPeopleQuery()->paginate($this->perPage);
+    }
+
+    public function getUsergroups()
+    {
+        return People::select('usergroup')->distinct()->orderBy('usergroup')->get()->pluck('usergroup')->toArray();
     }
 
     public function exportCsv()
@@ -65,6 +72,9 @@ class PeopleReport extends Component
             })
             ->when($this->peopleType != 'any', function ($query) {
                 return $query->where('type', '=', $this->peopleType);
+            })
+            ->when($this->usergroup != '', function ($query) {
+                return $query->where('usergroup', '=', $this->usergroup);
             });
     }
 }
