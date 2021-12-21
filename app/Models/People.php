@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class People extends Model
 {
@@ -22,6 +23,16 @@ class People extends Model
     public function desks()
     {
         return $this->hasMany(Desk::class);
+    }
+
+    public function notes()
+    {
+        return $this->morphMany(Note::class, 'noteable');
+    }
+
+    public function getHtmlIdAttribute(): string
+    {
+        return Str::slug($this::class) . '-' . $this->id;
     }
 
     public function lockers()

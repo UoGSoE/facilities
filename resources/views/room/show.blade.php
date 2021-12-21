@@ -5,6 +5,7 @@
             <h3>Details for {{ $room->building->name }} room {{ $room->name }}</h3>
         </div>
         <a href="{{ route('room.edit', $room) }}" class="btn btn-light">Edit</a>
+        @livewire('notes-editor', ['model' => $room])
     </div>
     <hr>
     <div class="d-flex justify-content-between">

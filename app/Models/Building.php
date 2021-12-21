@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Building extends Model
 {
@@ -15,6 +16,16 @@ class Building extends Model
     public function rooms()
     {
         return $this->hasMany(Room::class);
+    }
+
+    public function notes()
+    {
+        return $this->morphMany(Note::class, 'noteable');
+    }
+
+    public function getHtmlIdAttribute(): string
+    {
+        return Str::slug($this::class) . '-' . $this->id;
     }
 
     public function desks()

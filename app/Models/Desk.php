@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Desk extends Model
 {
@@ -28,6 +29,16 @@ class Desk extends Model
     public function owner()
     {
         return $this->belongsTo(People::class, 'people_id');
+    }
+
+    public function notes()
+    {
+        return $this->morphMany(Note::class, 'noteable');
+    }
+
+    public function getHtmlIdAttribute(): string
+    {
+        return Str::slug($this::class) . '-' . $this->id;
     }
 
     public function room()

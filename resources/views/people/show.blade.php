@@ -1,6 +1,9 @@
 <x-layouts.app>
     @section('title') {{ $person->full_name }} @endsection
-    <h3>Details for {{ $person->full_name }}</h3>
+    <h3>
+        Details for {{ $person->full_name }}
+        @livewire('notes-editor', ['model' => $person])
+    </h3>
     <hr>
     <div class="d-flex justify-content-between">
         <div>
