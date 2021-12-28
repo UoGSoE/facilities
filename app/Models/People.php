@@ -15,6 +15,17 @@ class People extends Model
     const TYPE_PDRA = 'PDRA';
     const TYPE_MPATECH = 'MPA/Techs';
 
+    protected $fillable = [
+        'username',
+        'email',
+        'surname',
+        'forenames',
+        'start_at',
+        'end_at',
+        'supervisor_id',
+        'type',
+    ];
+
     protected $casts = [
         'start_at' => 'date',
         'end_at' => 'date',
@@ -28,6 +39,11 @@ class People extends Model
     public function notes()
     {
         return $this->morphMany(Note::class, 'noteable');
+    }
+
+    public function ivantiNotes()
+    {
+        return $this->notes()->ivanti();
     }
 
     public function getHtmlIdAttribute(): string

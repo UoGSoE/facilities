@@ -10,7 +10,7 @@ class Note extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['body', 'user_id', 'noteable_id', 'noteable_type'];
+    protected $fillable = ['body', 'user_id', 'noteable_id', 'noteable_type', 'created_at', 'updated_at'];
 
     public function user()
     {
@@ -20,6 +20,11 @@ class Note extends Model
     public function noteable()
     {
         return $this->morphTo();
+    }
+
+    public function scopeIvanti($query)
+    {
+        return $query->where('body', 'like', 'IVANTI %');
     }
 
     public function getHtmlIdAttribute(): string
