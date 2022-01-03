@@ -31,4 +31,13 @@ class Note extends Model
     {
         return Str::slug($this->noteable_type) . '-' . $this->noteable_id . '-note-' . $this->id;
     }
+
+    public function getIvantiNumberAttribute(): string
+    {
+        if (preg_match('/IVANTI (\d+)/', $this->body) !== 1) {
+            return '';
+        }
+
+        return preg_replace('/IVANTI (\d+) :.*/', '$1', $this->body);
+    }
 }

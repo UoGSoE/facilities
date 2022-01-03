@@ -14,10 +14,13 @@ use App\Mail\PendingAllocationEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Ohffs\CountsDatabaseQueries\CountsDatabaseQueries;
 
 class PendingPeopleReportTest extends TestCase
 {
     use RefreshDatabase;
+    use CountsDatabaseQueries;
+
 
     /** @test */
     public function we_can_see_the_main_pending_people_report_page()
@@ -26,11 +29,14 @@ class PendingPeopleReportTest extends TestCase
         $user = User::factory()->create();
         $pendingPeople = People::factory()->pending()->count(3)->create(['start_at' => now()->addWeek()]);
         $allocatedPeople = People::factory()->count(3)->create();
+        $allocatedPeople->each(fn ($person) => $person->desks()->save(Desk::factory()->create()));
+        $this->countDatabaseQueries();
 
         $response = $this->actingAs($user)->get(route('reports.pending'));
 
         $response->assertOk();
         $response->assertSee('Pending People');
+        $this->assertQueryCountEquals(6);
         $pendingPeople->each(function ($pendingPeople) use ($response) {
             $response->assertSee($pendingPeople->full_name);
         });
@@ -50,6 +56,7 @@ class PendingPeopleReportTest extends TestCase
         $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $allocatedPerson = People::factory()->create();
+        $allocatedPerson->desks()->save(Desk::factory()->create());
 
         Livewire::actingAs($user)->test('pending-people-report')
             ->assertSee($pendingPerson1->full_name)
@@ -101,6 +108,7 @@ class PendingPeopleReportTest extends TestCase
         $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $allocatedPerson = People::factory()->create();
+        $allocatedPerson->desks()->save(Desk::factory()->create());
 
         Livewire::actingAs($user)->test('pending-people-report')
             ->assertSee($pendingPerson1->full_name)
@@ -148,6 +156,7 @@ class PendingPeopleReportTest extends TestCase
         $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $allocatedPerson = People::factory()->create();
+        $allocatedPerson->desks()->save(Desk::factory()->create());
 
         Livewire::actingAs($user)->test('pending-people-report')
             ->assertSee($pendingPerson1->full_name)
@@ -186,6 +195,7 @@ class PendingPeopleReportTest extends TestCase
         $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $allocatedPerson = People::factory()->create();
+        $allocatedPerson->desks()->save(Desk::factory()->create());
 
         Livewire::actingAs($user)->test('pending-people-report')
             ->assertSee($pendingPerson1->full_name)
@@ -229,6 +239,7 @@ class PendingPeopleReportTest extends TestCase
         $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $allocatedPerson = People::factory()->create();
+        $allocatedPerson->desks()->save(Desk::factory()->create());
 
         Livewire::actingAs($user)->test('pending-people-report')
             ->assertSee($pendingPerson1->full_name)
@@ -268,6 +279,7 @@ class PendingPeopleReportTest extends TestCase
         $pendingPerson2 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $pendingPerson3 = People::factory()->pending()->create(['start_at' => now()->addWeek()]);
         $allocatedPerson = People::factory()->create();
+        $allocatedPerson->lockers()->save(Locker::factory()->create());
 
         Livewire::actingAs($user)->test('pending-people-report')
             ->assertSee($pendingPerson1->full_name)

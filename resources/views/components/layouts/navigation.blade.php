@@ -19,6 +19,8 @@
                 <li><a class="dropdown-item" href="{{ route('reports.supervisors') }}">Supervisors</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="{{ route('user.index') }}">Manage Access</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ route('import.new_requests_form') }}">Import New Requests</a></li>
             </ul>
           </li>
         </ul>

@@ -5,14 +5,18 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\People;
+use Illuminate\Http\UploadedFile;
+use Ohffs\SimpleSpout\ExcelSheet;
 use App\Jobs\ProcessNewRequestRow;
 use App\Mail\NewRequestsProcessed;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
 use App\Jobs\ProcessNewRequestsBatch;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Redis;
 
 class ImportNewRequestsTest extends TestCase
 {
@@ -49,6 +53,16 @@ class ImportNewRequestsTest extends TestCase
             $this->assertEquals('06/10/2021', $person->notes->first()->updated_at->format('d/m/Y'));
             $this->assertEquals('IVANTI 132496 : Hi - hope this finds you well,Previously my desk was located on level 7', $person->notes->first()->body);
         });
+    }
+
+    /** @test */
+    public function rows_which_contain_invalid_data_are_skipped_and_a_message_logged_using_redis()
+    {
+        Redis::shouldReceive('sadd')->once()->with('new_requests_import_errors_', 'The first column must be a number');
+
+        ProcessNewRequestRow::dispatchSync(['wut', 'lol']);
+
+        $this->assertEquals(0, People::count());
     }
 
     /** @test */
@@ -110,5 +124,33 @@ class ImportNewRequestsTest extends TestCase
         Mail::assertQueued(NewRequestsProcessed::class, function ($mail) use ($user) {
             return $mail->hasTo($user->email);
         });
+    }
+
+    /** @test */
+    public function users_can_upload_a_spreadsheet_via_the_web_which_kicks_off_the_queued_jobs()
+    {
+        $this->withoutExceptionHandling();
+        Storage::fake();
+        Queue::fake();
+        $user = User::factory()->create();
+
+        $fakeData = [
+            $this->singleRow,
+            $this->singleRow,
+        ];
+        $fakeSheetFilename = (new ExcelSheet)->generate($fakeData);
+
+        $response = $this->actingAs($user)->get(route('import.new_requests_form'));
+
+        $response->assertOk();
+        $response->assertSee('Import new requests');
+
+        $response = $this->actingAs($user)->post(route('import.new_requests'), [
+            'sheet' => UploadedFile::fake()->createWithContent('test.xlsx', file_get_contents($fakeSheetFilename)),
+        ]);
+
+        $response->assertRedirect(route('home'));
+        $response->assertSessionHas('success', 'Import started - you will get an email once it is complete.');
+        Queue::assertPushed(ProcessNewRequestsBatch::class, 1);
     }
 }

@@ -49,6 +49,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/people/{person}', [\App\Http\Controllers\PeopleController::class, 'show'])->name('people.show');
 
     Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('user.index');
+
+    Route::get('/import/new-requests', [\App\Http\Controllers\ImportNewRequestsController::class, 'create'])->name('import.new_requests_form');
+    Route::post('/import/new-requests', [\App\Http\Controllers\ImportNewRequestsController::class, 'store'])->name('import.new_requests');
 });
 
 require __DIR__.'/auth.php';

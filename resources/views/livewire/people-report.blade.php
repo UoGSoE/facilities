@@ -72,8 +72,8 @@
                             </a>
                         @endif
                     </td>
-                    <td>{{ $person->start_at->format('d/m/Y') }}</td>
-                    <td>{{ $person->end_at->format('d/m/Y') }}</td>
+                    <td>{{ optional($person->start_at)->format('d/m/Y') }}</td>
+                    <td>{{ optional($person->end_at)->format('d/m/Y') }}</td>
                     <td>{{ $person->desks_count }}</td>
                     <td>{{ $person->lockers_count }}</td>
                     <td>{{ $person->it_assets_count }}</td>

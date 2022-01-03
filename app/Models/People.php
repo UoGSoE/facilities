@@ -43,7 +43,7 @@ class People extends Model
 
     public function ivantiNotes()
     {
-        return $this->notes()->ivanti();
+        return $this->notes()->ivanti()->latest();
     }
 
     public function getHtmlIdAttribute(): string
@@ -104,5 +104,10 @@ class People extends Model
     public function hasLeft(): bool
     {
         return $this->end_at->isPast();
+    }
+
+    public function getLatestIvantiNumber(): ?string
+    {
+        return $this->ivantiNotes->last()->ivanti_number ?? null;
     }
 }

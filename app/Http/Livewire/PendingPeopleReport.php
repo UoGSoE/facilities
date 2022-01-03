@@ -49,10 +49,10 @@ class PendingPeopleReport extends Component
 
     protected function refreshPeopleList()
     {
-        $this->people = People::pending()->noFacilities()
+        $this->people = People::noFacilities()
             ->when($this->filterType != 'any', fn ($query) => $query->where('type', '=', $this->filterType))
             ->when($this->filterWeeks > 0, fn ($query) => $query->where('start_at', '<=', now()->addWeeks($this->filterWeeks)))
-            ->with('supervisor')
+            ->with(['supervisor', 'notes', 'ivantiNotes'])
             ->orderBy('start_at')
             ->get();
         $this->allocate = [];
@@ -62,7 +62,7 @@ class PendingPeopleReport extends Component
             $this->allocate[$person->id] = false;
             $this->deskAllocations[$person->id] = 0;
             $this->lockerAllocations[$person->id] = 0;
-            $this->avantiIds[$person->id] = null;
+            $this->avantiIds[$person->id] = $person->getLatestIvantiNumber();
         });
     }
 

@@ -95,6 +95,17 @@
                         </div>
                     </td>
                 </tr>
+                @if ($person->ivantiNotes->count() > 0)
+                    <tr>
+                        <td colspan="8">
+                                <ul class="list-group">
+                                    @foreach ($person->notes as $note)
+                                        <li class="list-group-item">{{ $note->body }}</li>
+                                    @endforeach
+                                </ul>
+                        </td>
+                    </tr>
+                @endif
             @endforeach
         </tbody>
     </table>

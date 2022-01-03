@@ -13,6 +13,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^2.7",
+        "ohffs/counts-database-queries-trait": "^1.0",
+        "ohffs/simple-spout": "^1.3",
         "sentry/sentry-laravel": "^2.10",
         "uogsoe/ldap-laravel": "^3.0"
     },
