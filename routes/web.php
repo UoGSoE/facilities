@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/room/{room}', [\App\Http\Controllers\RoomController::class, 'update'])->name('room.update');
     Route::get('/room/{room}/delete', [\App\Http\Controllers\RoomController::class, 'delete'])->name('room.delete');
     Route::post('/room/{room}/delete', [\App\Http\Controllers\RoomController::class, 'destroy'])->name('room.destroy');
+    Route::get('/room/{room}/image', [\App\Http\Controllers\RoomImageController::class, 'show'])->name('room.image');
 
     Route::get('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'show'])->name('room.reallocate');
     Route::post('/room/{room}/reallocate', [\App\Http\Controllers\RoomReallocationController::class, 'update'])->name('room.do_reallocate');

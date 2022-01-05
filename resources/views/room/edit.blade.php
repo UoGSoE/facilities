@@ -13,12 +13,26 @@
         <span class="bg-danger text-white p-2">Owner Has Left</span>
     </div>
     <hr>
-        <form action="" method="post" class="row row-cols-lg-auto g-3 align-items-center d-flex justify-content-between">
+    @error('name')
+        <div class="alert alert-danger">{{ $message }}</div>
+    @enderror
+    @error('image')
+        <div class="alert alert-danger">{{ $message }}</div>
+    @enderror
+        <form action="{{ route('room.update', $room) }}" method="post" enctype="multipart/form-data">
             @csrf
+            <div  class="row row-cols-lg-auto g-3 align-items-center d-flex justify-content-between">
+
                 <div class="col-12">
                     <div class="input-group">
                         <div class="input-group-text">Name</div>
-                        <input type="text" class="form-control" id="room_name" name="room_name" value="{{ $room->name }}" required>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ $room->name }}" required>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="input-group">
+                        <div class="input-group-text">Picture</div>
+                        <input class="form-control" type="file" id="formFile" name="image">
                     </div>
                 </div>
 
@@ -41,7 +55,7 @@
                             <button class="btn btn-secondary">Update</button>
                         </div>
                     </div>
-        </form>
+            </div>
         <hr>
         @foreach ($room->desks->chunk(3) as $someDesks)
             <div class="row">
@@ -59,13 +73,13 @@
                                     >
                                         Desk {{ $desk->name }}
                                     </div>
-                                    <select class="form-select form-select-sm" aria-label="Select person using Desk {{ $desk->name }}">
+                                    <select name="desks[{{ $desk->id }}][people_id]" class="form-select form-select-sm" aria-label="Select person using Desk {{ $desk->name }}">
                                         <option value="">No-one</option>
                                         @foreach ($people as $person)
                                             <option value="{{ $person->id }}" @if ($desk->people_id == $person->id) selected @endif>{{ $person->full_name }}</option>
                                         @endforeach
                                     </select>
-                                    <input type="text" class="form-control" placeholder="Avanti No." value="{{ $desk->avanti_ticket_id }}" aria-label="Avanti Ticket Number" aria-describedby="basic-addon2">
+                                    <input name="desks[{{ $desk->id }}][avanti_ticket_id]" type="text" class="form-control" placeholder="Avanti No." value="{{ $desk->avanti_ticket_id }}" aria-label="Avanti Ticket Number" aria-describedby="basic-addon2">
                                 </div>
                             </div>
                     </div>
@@ -90,18 +104,19 @@
                                     >
                                         Locker {{ $locker->name }}
                                     </div>
-                                    <select class="form-select form-select-sm" aria-label="Select person using locker {{ $locker->name }}">
+                                    <select name="lockers[{{ $locker->id }}][people_id]" class="form-select form-select-sm" aria-label="Select person using locker {{ $locker->name }}">
                                         <option value="">No-one</option>
                                         @foreach ($people as $person)
                                             <option value="{{ $person->id }}" @if ($locker->people_id == $person->id) selected @endif>{{ $person->full_name }}</option>
                                         @endforeach
                                     </select>
-                                    <input type="text" class="form-control" placeholder="Avanti No." value="{{ $locker->avanti_ticket_id }}" aria-label="Avanti Ticket Number" aria-describedby="basic-addon2">
+                                    <input name="lockers[{{ $locker->id }}][avanti_ticket_id]" type="text" class="form-control" placeholder="Avanti No." value="{{ $locker->avanti_ticket_id }}" aria-label="Avanti Ticket Number" aria-describedby="basic-addon2">
                                 </div>
                             </div>
                     </div>
                 @endforeach
             </div>
         @endforeach
+    </form>
 
 </x-layouts.app>

@@ -1,16 +1,25 @@
 <x-layouts.app>
     <h3>Add a new room to <a href="{{ route('building.show', $room->building) }}">{{ $room->building->name }}</a></h3>
     <hr>
-    <form action="{{ route('room.store', $building->id) }}" method="post" class="row row-cols-lg-auto g-3 align-items-center d-flex justify-content-between">
+    @error('name')
+        <div class="alert alert-danger">{{ $message }}</div>
+    @enderror
+    @error('image')
+        <div class="alert alert-danger">{{ $message }}</div>
+    @enderror
+    <form action="{{ route('room.store', $building->id) }}" method="post" enctype="multipart/form-data" class="row row-cols-lg-auto g-3 align-items-center d-flex justify-content-between">
         @csrf
         <div class="col-12">
             <div class="input-group">
                 <div class="input-group-text">Name</div>
                 <input type="text" class="form-control" id="name" name="name" value="{{ $room->name }}" required>
             </div>
-            @error('name')
-            <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
+        </div>
+        <div class="col-12">
+            <div class="input-group">
+                <div class="input-group-text">Picture</div>
+                <input class="form-control" type="file" id="formFile" name="image">
+            </div>
         </div>
 
         <div class="col-12">

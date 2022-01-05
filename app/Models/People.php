@@ -24,11 +24,13 @@ class People extends Model
         'end_at',
         'supervisor_id',
         'type',
+        'has_new_request',
     ];
 
     protected $casts = [
         'start_at' => 'date',
         'end_at' => 'date',
+        'has_new_request' => 'boolean',
     ];
 
     public function desks()
@@ -86,6 +88,11 @@ class People extends Model
         return $query->whereDoesntHave('desks')->whereDoesntHave('lockers');
     }
 
+    public function scopeHasOutstandingRequest($query)
+    {
+        return $query->where('has_new_request', '=', true);
+    }
+
     public function getFullNameAttribute(): string
     {
         return "{$this->forenames} {$this->surname}";
@@ -98,16 +105,39 @@ class People extends Model
 
     public function isLeavingSoon(): bool
     {
+        if (! $this->end_at) {
+            return false;
+        }
         return (! $this->end_at->isPast()) && ($this->end_at->diffInDays(now()) <= 28);
     }
 
     public function hasLeft(): bool
     {
+        if (! $this->end_at) {
+            return false;
+        }
         return $this->end_at->isPast();
     }
 
     public function getLatestIvantiNumber(): ?string
     {
         return $this->ivantiNotes->last()->ivanti_number ?? null;
+    }
+
+    public function flagNewRequest()
+    {
+        $this->has_new_request = true;
+        $this->save();
+    }
+
+    public function flagRequestFilled()
+    {
+        $this->has_new_request = false;
+        $this->save();
+    }
+
+    public function hasNewRequest(): bool
+    {
+        return (bool) $this->has_new_request;
     }
 }

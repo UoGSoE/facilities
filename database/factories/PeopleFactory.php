@@ -66,6 +66,7 @@ class PeopleFactory extends Factory
             return [
                 'start_at' => now()->addWeeks(rand(1, 8)),
                 'end_at' => now()->addWeeks(rand(12, 100)),
+                'has_new_request' => true,
             ];
         });
     }

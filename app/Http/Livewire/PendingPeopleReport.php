@@ -49,7 +49,7 @@ class PendingPeopleReport extends Component
 
     protected function refreshPeopleList()
     {
-        $this->people = People::noFacilities()
+        $this->people = People::hasOutstandingRequest()
             ->when($this->filterType != 'any', fn ($query) => $query->where('type', '=', $this->filterType))
             ->when($this->filterWeeks > 0, fn ($query) => $query->where('start_at', '<=', now()->addWeeks($this->filterWeeks)))
             ->with(['supervisor', 'notes', 'ivantiNotes'])
@@ -177,9 +177,10 @@ class PendingPeopleReport extends Component
         collect($this->deskAllocations)->filter(fn ($required) => $required > 0)->each(function ($desksRequired, $personId) {
             $desks = $this->findUnallocatedDesks($desksRequired);
             $desks->each(function ($desk) use ($personId) {
-                $desk->allocateToId($personId, $this->avantiIds[$personId]);
+                $person = People::find($personId);
+                $desk->allocateToId($person->id, $this->avantiIds[$personId]);
                 $this->allocatedAssets[] = [
-                    'person' => People::find($personId)->full_name,
+                    'person' => $person->full_name,
                     'asset' => 'Desk ' . $desk->name,
                     'building' =>  $desk->room->building->name,
                     'room' => $desk->room->name,

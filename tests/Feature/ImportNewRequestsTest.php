@@ -51,6 +51,7 @@ class ImportNewRequestsTest extends TestCase
             $this->assertEquals('a.mcsmith.1@research.gla.ac.uk', $person->email);
             $this->assertEquals('05/10/2021', $person->notes->first()->created_at->format('d/m/Y'));
             $this->assertEquals('06/10/2021', $person->notes->first()->updated_at->format('d/m/Y'));
+            $this->assertTrue($person->hasNewRequest());
             $this->assertEquals('IVANTI 132496 : Hi - hope this finds you well,Previously my desk was located on level 7', $person->notes->first()->body);
         });
     }

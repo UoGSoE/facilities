@@ -71,6 +71,7 @@ class ProcessNewRequestRow implements ShouldQueue
                 'created_at' => $this->cellAsDateObject($this->row[9]),
                 'updated_at' => $this->cellAsDateObject($this->row[11]),
             ]);
+            $person->flagNewRequest();
         }
     }
 

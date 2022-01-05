@@ -22,6 +22,7 @@ class CreatePeopleTable extends Migration
             $table->date('start_at')->nullable();
             $table->date('end_at')->nullable();
             $table->string('type')->nullable();
+            $table->boolean('has_new_request')->default(false);
             $table->foreignId('supervisor_id')->nullable()->constrained('people')->onDelete('set null');
             $table->timestamps();
         });

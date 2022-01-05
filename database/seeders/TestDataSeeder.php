@@ -50,7 +50,7 @@ class TestDataSeeder extends Seeder
             Locker::inRandomOrder()->take(rand(1, 2))->update(['people_id' => $person->id]);
             ItAsset::inRandomOrder()->take(rand(3, 5))->update(['people_id' => $person->id]);
         });
-        $pendingPeople = collect(range(1, rand(20, 50)))->map(fn ($count) => People::factory()->create(['start_at' => now()->addDays(rand(1, 30))]));
+        $pendingPeople = collect(range(1, rand(20, 50)))->map(fn ($count) => People::factory()->pending()->create(['start_at' => now()->addDays(rand(1, 30))]));
         $supervisors = People::factory()->count(rand(10, 20))->create();
         $otherPeople = People::whereNotIn('id', $supervisors->pluck('id')->toArray())->get()->each(function ($person) use ($supervisors) {
             $person->supervisor_id = $supervisors->random()->id;

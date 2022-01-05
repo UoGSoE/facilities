@@ -27,6 +27,7 @@ trait GenericAllocationLogic
     public function allocateToId(int $personId, ?string $avantiTicketId = '')
     {
         $this->update(['people_id' => $personId, 'avanti_ticket_id' => $avantiTicketId]);
+        People::find($personId)->flagRequestFilled();
     }
 
     public function deallocate()

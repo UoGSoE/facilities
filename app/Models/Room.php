@@ -3,14 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Room extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'building_id'];
+    protected $fillable = ['name', 'building_id', 'image_path'];
 
     public function building()
     {
@@ -45,5 +47,22 @@ class Room extends Model
     public function getUnallocatedLockerCountAttribute()
     {
         return $this->lockers->filter(fn ($locker) => $locker->isUnallocated())->count();
+    }
+
+    public function storeImage($newImage): string
+    {
+        $image = Image::make($newImage);
+        $image->resize(1280, 1280, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+
+        $path = 'room-images/' . $this->id . '.jpg';
+
+        Storage::put($path, (string) $image->encode('jpg'));
+
+        $this->update(['image_path' => $path]);
+
+        return $path;
     }
 }

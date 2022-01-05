@@ -30,6 +30,8 @@ class PendingPeopleReportTest extends TestCase
         $pendingPeople = People::factory()->pending()->count(3)->create(['start_at' => now()->addWeek()]);
         $allocatedPeople = People::factory()->count(3)->create();
         $allocatedPeople->each(fn ($person) => $person->desks()->save(Desk::factory()->create()));
+        $pendingPeople->each(fn ($person) => $this->assertTrue($person->hasNewRequest()));
+
         $this->countDatabaseQueries();
 
         $response = $this->actingAs($user)->get(route('reports.pending'));

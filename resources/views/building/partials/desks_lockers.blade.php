@@ -2,14 +2,23 @@
         <div class="d-flex justify-content-between mb-4 bg-light p-4 shadow-sm">
             <h5>
                 Room {{ $room->name }}
-                <a href="{{ route('email.room_form', $room) }}" class="btn btn-light btn-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
-                    </svg>
+                <a href="{{ route('email.room_form', $room) }}" class="btn">
+                    <i class="bi bi-envelope"></i>
+                    <span>Email</span>
                 </a>
+                @if ($room->image_path)
+                <span x-data="{ open: false, image: '{{ route('room.image', $room->id) }}' }">
+                    <button class="btn" @click="open = ! open"><i class="bi bi-image"></i><span>Image</span></button>
+                    <span x-show="open">
+                        <p class="mt-4"><img :src="image" class="img-fluid"/></p>
+                    </span>
+                </span>
+                @endif
             </h5>
 
-            <a href="{{ route('room.edit', $room) }}" class="btn btn-secondary">Edit</a>
+            <div>
+                <a href="{{ route('room.edit', $room) }}" class="btn btn-secondary">Edit</a>
+            </div>
         </div>
         @foreach ($room->desks->chunk(4) as $someDesks)
             <div class="row">
