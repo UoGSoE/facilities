@@ -21,7 +21,11 @@ class Desk extends Model
     {
         static::updating(function ($desk) {
             if ($desk->isDirty('people_id')) {
-                $desk->allocated_at = now();
+                if ($desk->people_id) {
+                    $desk->allocated_at = now();
+                } else {
+                    $desk->allocated_at = null;
+                }
             }
         });
     }

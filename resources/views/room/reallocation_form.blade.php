@@ -4,7 +4,8 @@
         Reallocation is done on a 'best effort' basis. If a person is not reallocated in the way chosen (ie, not enough desks in the new
         building), they will be allocated in another one.
     </p>
-    <form>
+    <form method="POST" action="{{ route('room.do_reallocate', $room) }}">
+        @csrf
         <div class="input-group">
             <select class="form-select" id="reallocate_to" multiple name="reallocate_to[]" aria-label="Reallocate all users to new room" required>
                 <option value="-1" selected>Anywhere</option>

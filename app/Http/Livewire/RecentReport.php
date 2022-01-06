@@ -4,14 +4,18 @@ namespace App\Http\Livewire;
 
 use App\Models\Desk;
 use App\Models\Locker;
+use App\Models\People;
 use Livewire\Component;
+use App\Mail\YourRecentAllocation;
+use Illuminate\Support\Facades\Mail;
 
 class RecentReport extends Component
 {
     public $filterWeeks = 4;
     public $peopleType = 'any';
     public $assetType = 'any';
-    protected $recents;
+    public $mailToIds = [];
+    protected $recents = [];
 
     protected $queryString = [
         'filterWeeks',
@@ -19,21 +23,18 @@ class RecentReport extends Component
         'assetType',
     ];
 
-    public function mount()
-    {
-        $this->getRecentAllocations();
-    }
-
     public function render()
     {
         return view('livewire.recent-report', [
-            'assets' => $this->recents,
+            'assets' => $this->getRecentAllocations(),
         ]);
     }
 
-    public function updated()
+    public function updated($name, $value)
     {
-        $this->getRecentAllocations();
+        if ($name != 'mailToIds') {
+            $this->mailToIds = [];
+        }
     }
 
     protected function getRecentAllocations()
@@ -57,6 +58,7 @@ class RecentReport extends Component
                     });
                 }
             );
+        return $this->recents;
     }
 
     public function exportCsv()
@@ -74,5 +76,19 @@ class RecentReport extends Component
                 echo $asset->avanti_ticket_id . "\n";
             }
         }, 'recent_allocated_facilites_' . now()->format('d-m-Y-H-i') . '.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    public function sendEmail()
+    {
+        if (count($this->mailToIds) == 0) {
+            return;
+        }
+
+        foreach ($this->mailToIds as $peopleId) {
+            $person = People::findOrFail($peopleId);
+            Mail::to($person)->later(now()->addSeconds(rand(10, 300)), new YourRecentAllocation($peopleId));
+        }
+
+        session()->flash('emailMessage', 'Emails sent!');
     }
 }

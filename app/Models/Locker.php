@@ -21,7 +21,11 @@ class Locker extends Model
     {
         static::updating(function ($locker) {
             if ($locker->isDirty('people_id')) {
-                $locker->allocated_at = now();
+                if ($locker->people_id) {
+                    $locker->allocated_at = now();
+                } else {
+                    $locker->allocated_at = null;
+                }
             }
         });
     }

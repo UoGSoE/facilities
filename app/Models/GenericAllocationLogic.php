@@ -6,7 +6,7 @@ trait GenericAllocationLogic
 {
     public function scopeRecentlyAllocated($query, int $numberOfDays = 28)
     {
-        return $query->where('allocated_at', '>=', now()->subDays($numberOfDays));
+        return $query->whereNotNull('people_id')->where('allocated_at', '>=', now()->subDays($numberOfDays));
     }
 
     public function scopeUnallocated($query)

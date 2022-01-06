@@ -26,12 +26,25 @@
         </div>
     </div>
     <hr>
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-between">
+        <div>
+        <button wire:click.prevent="sendEmail" @if (count($mailToIds) == 0 || session()->has('emailMessage')) disabled @endif class="btn btn-outline-success me-2">
+            @if (session()->has('emailMessage'))
+                {{ session('emailMessage') }}
+            @else
+                Email Their Allocations
+            @endif
+        </button>
+        </div>
+
+        <div>
         <button wire:click.prevent="exportCsv" class="btn btn-outline-primary">Export</button>
+        </div>
     </div>
     <table class="table">
         <thead>
             <tr>
+                <th><i class="bi bi-envelope"></i></th>
                 <th>Person</th>
                 <th>Type</th>
                 <th>Asset</th>
@@ -44,6 +57,9 @@
         <tbody>
             @foreach ($assets as $asset)
                 <tr>
+                    <td>
+                        <input type="checkbox" wire:model="mailToIds" value="{{ $asset->owner->id }}">
+                    </td>
                     <td>
                         <a href="{{ route('people.show', $asset->owner) }}">
                             {{ $asset->owner->full_name }}

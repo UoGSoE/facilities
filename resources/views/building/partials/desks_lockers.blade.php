@@ -1,5 +1,5 @@
         <hr>
-        <div class="d-flex justify-content-between mb-4 bg-light p-4 shadow-sm">
+        <div class="d-flex justify-content-between bg-light p-4 shadow-sm">
             <h5>
                 Room {{ $room->name }}
                 <a href="{{ route('email.room_form', $room) }}" class="btn">
@@ -20,6 +20,50 @@
                 <a href="{{ route('room.edit', $room) }}" class="btn btn-secondary">Edit</a>
             </div>
         </div>
+        @if ($room->desks->count() > 0)
+            <div class="d-flex justify-content-between bg-light ps-4 pe-4 shadow-sm @if ($room->lockers->count() == 0)  mb-4 pb-4 @endif">
+                <div>
+                    <span>Total Desks</span>
+                    <span class="fw-bold">{{ $room->desks->count() }}</span>
+                </div>
+                <div>
+                    <span>Desks Used</span>
+                    <span class="fw-bold">{{ $room->desks->whereNotNull('people_id')->count() }} ({{ number_format(($room->desks->whereNotNull('people_id')->count() / $room->desks->count()) * 100, 1) }}%)</span>
+                </div>
+                <div>
+                    <span>Desks Available</span>
+                    <span class="fw-bold">{{ $room->desks->whereNull('people_id')->count() }} ({{ number_format(($room->desks->whereNull('people_id')->count() / $room->desks->count()) * 100, 1) }}%)</span>
+                </div>
+                <div>
+                    <span>Desks free in the next 28 days</span>
+                    <span class="fw-bold">
+                        {{ $room->desks->whereNotNull('people_id')->sum(fn ($desk) => $desk->owner->isLeavingSoon()) }} ({{ number_format(($room->desks->whereNotNull('people_id')->sum(fn ($desk) => $desk->owner->isLeavingSoon()) / $room->desks->count()) * 100, 1) }}%)
+                    </span>
+                </div>
+            </div>
+        @endif
+        @if ($room->lockers->count() > 0)
+            <div class="d-flex justify-content-between mb-4 bg-light ps-4 pe-4 pb-4 shadow-sm">
+                <div>
+                    <span>Total Lockers</span>
+                    <span class="fw-bold">{{ $room->lockers->count() }}</span>
+                </div>
+                <div>
+                    <span>Lockers Used</span>
+                    <span class="fw-bold">{{ $room->lockers->whereNotNull('people_id')->count() }} ({{ number_format(($room->lockers->whereNotNull('people_id')->count() / $room->lockers->count()) * 100, 1) }}%)</span>
+                </div>
+                <div>
+                    <span>Lockers Available</span>
+                    <span class="fw-bold">{{ $room->lockers->whereNull('people_id')->count() }} ({{ number_format(($room->lockers->whereNull('people_id')->count() / $room->lockers->count()) * 100, 1) }}%)</span>
+                </div>
+                <div>
+                    <span>Lockers free in the next 28 days</span>
+                    <span class="fw-bold">
+                        {{ $room->lockers->whereNotNull('people_id')->sum(fn ($locker) => $locker->owner->isLeavingSoon()) }} ({{ number_format(($room->lockers->whereNotNull('people_id')->sum(fn ($locker) => $locker->owner->isLeavingSoon()) / $room->lockers->count()) * 100, 1) }}%)
+                    </span>
+                </div>
+            </div>
+        @endif
         @foreach ($room->desks->chunk(4) as $someDesks)
             <div class="row">
                 @foreach ($someDesks as $desk)

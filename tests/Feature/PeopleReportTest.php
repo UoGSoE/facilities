@@ -91,7 +91,13 @@ class PeopleReportTest extends TestCase
             ->assertDontSee($bioEngPeople[1]->surname)
             ->set('usergroup', '')
             ->assertSee($bioEngPeople[0]->surname)
-            ->assertSee($bioEngPeople[1]->surname);
+            ->assertSee($bioEngPeople[1]->surname)
+            // supervisor
+            ->assertSee('TODO')
+            // building
+            ->assertSee('TODO')
+            // room
+            ->assertSee('TODO');
         ;
     }
 

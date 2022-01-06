@@ -54,7 +54,7 @@ class ReallocationTest extends TestCase
             });
         });
 
-        $newBuilding = $buildings->random();
+        $newBuilding = $buildings->where('id', '!=', $originalRoom->building_id)->random();
 
         $response = $this->actingAs($user)->post(route('room.do_reallocate', $originalRoom), [
             'reallocate_to' => [

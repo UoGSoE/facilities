@@ -45,11 +45,9 @@ class RoomReallocationController extends Controller
                     return redirect()->route('room.edit', $room->id)->with('error', 'Ran out of spare desks while trying to re-allocate.');
                 }
             }
-            $newDesk->update([
-                'people_id' => $desk->owner->id,
-            ]);
+            $newDesk->allocateTo($desk->owner);
+            $desk->deallocate();
         }
-        $room->desks()->allocated()->update(['people_id' => null]);
 
         $unallocatedLockersInNewBuildings = $newBuildings->flatMap(fn ($building) => $building->getUnallocatedLockers())->shuffle();
         $lockersToReallocate = $room->lockers()->allocated()->with('owner')->get();
@@ -61,11 +59,9 @@ class RoomReallocationController extends Controller
                     return redirect()->route('room.edit', $room->id)->with('error', 'Ran out of spare lockers while trying to re-allocate.');
                 }
             }
-            $newLocker->update([
-                'people_id' => $locker->owner->id,
-            ]);
+            $newLocker->allocateTo($locker->owner);
+            $locker->deallocate();
         }
-        $room->lockers()->allocated()->update(['people_id' => null]);
 
         return redirect()->route('room.edit', $room->id)->with('success', 'Room re-allocated successfully.');
     }
