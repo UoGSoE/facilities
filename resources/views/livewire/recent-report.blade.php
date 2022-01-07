@@ -44,7 +44,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th><i class="bi bi-envelope"></i></th>
+                <th><button wire:click.prevent="toggleAllEmails" class="btn btn-sm ps-0"><i class="bi bi-envelope"></i></button></th>
                 <th>Person</th>
                 <th>Type</th>
                 <th>Asset</th>

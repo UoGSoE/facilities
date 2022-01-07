@@ -18,8 +18,8 @@ class PeopleFactory extends Factory
         return [
             'username' => $this->faker->unique()->userName(),
             'email' => $this->faker->unique()->email(),
-            'surname' => $this->faker->lastName(),
-            'forenames' => $this->faker->firstName(),
+            'surname' => $this->faker->unique()->lastName(),
+            'forenames' => $this->faker->unique()->firstName(),
             'start_at' => now()->subMonths(rand(1, 24)),
             'end_at' => now()->addDays(rand(0, 700)),
             'type' => $this->getRandomType(),

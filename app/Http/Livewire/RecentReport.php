@@ -49,7 +49,7 @@ class RecentReport extends Component
             $lockers = Locker::recentlyAllocated($this->filterWeeks * 7)->with('owner', 'room.building')->get();
         }
 
-        $this->recents = $desks->merge($lockers)->sortByDesc('allocated_at')
+        $this->recents = $desks->concat($lockers)->sortByDesc('allocated_at')
             ->when(
                 $this->peopleType != 'any',
                 function ($recents) {
@@ -76,6 +76,20 @@ class RecentReport extends Component
                 echo $asset->avanti_ticket_id . "\n";
             }
         }, 'recent_allocated_facilites_' . now()->format('d-m-Y-H-i') . '.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    public function toggleAllEmails()
+    {
+        if (! $this->recents) {
+            $this->getRecentAllocations();
+        }
+
+        if (count($this->mailToIds) != 0) {
+            $this->mailToIds = [];
+            return;
+        }
+
+        $this->mailToIds = collect($this->recents)->pluck('people_id')->values()->toArray();
     }
 
     public function sendEmail()

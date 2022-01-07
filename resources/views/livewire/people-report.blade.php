@@ -1,7 +1,7 @@
 <div>
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
-            <label for="" class="form-label">Leaving in the next</label>
+            <label for="" class="form-label">Leaving by</label>
             <div class="input-group">
                 <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="" wire:model="leavingWeeks">
                 <div class="input-group-text">weeks</div>
@@ -27,8 +27,39 @@
             </select>
         </div>
         <div class="col">
-            <label for="" class="form-label">Search</label>
-            <div class="input-group">
+            <label for="" class="form-label">Supervisor</label>
+            <select class="form-select" aria-label="User group" wire:model="supervisor">
+                <option value="">Any</option>
+                @foreach ($supervisors as $selectSupervisor)
+                    <option value="{{ $selectSupervisor->id }}">{{ $selectSupervisor->full_name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col">
+            <label for="" class="form-label">Building</label>
+            <select class="form-select" aria-label="Building" wire:model="building">
+                <option value="">Any</option>
+                @foreach ($buildings as $selectBuilding)
+                    <option value="{{ $selectBuilding->id }}">{{ $selectBuilding->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col">
+            <label for="" class="form-label" title="Select a building first">Room</label>
+            <select class="form-select" aria-label="Building" wire:model="room">
+                <option value="">Any</option>
+                @if ($building != "")
+                    @foreach ($rooms[$building] as $selectRoom)
+                        <option value="{{ $selectRoom->id }}">{{ $selectRoom->name }}</option>
+                    @endforeach
+                @endif
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Search for...</span>
                 <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="" wire:model="search">
             </div>
         </div>

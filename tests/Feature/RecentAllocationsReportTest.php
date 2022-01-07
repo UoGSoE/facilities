@@ -99,6 +99,8 @@ class RecentAllocationsReportTest extends TestCase
         Livewire::actingAs($user)->test(RecentReport::class)
             ->set('mailToIds', [$person1->id, $person3->id])
             ->call('toggleAllEmails')
+            ->assertSet('mailToIds', [])
+            ->call('toggleAllEmails')
             ->assertSet('mailToIds', [$person1->id, $person2->id, $person3->id, $person4->id])
             ->call('toggleAllEmails')
             ->assertSet('mailToIds', []);
